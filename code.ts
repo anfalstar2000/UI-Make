@@ -784,6 +784,7 @@ function getSectionForComponent(component: string): string {
     "alert-dialog": "Layout",
     divider: "Layout",
     dropdown: "Layout",
+    accordion: "Layout",
     faq: "Content",
     footer: "Content",
     avatar: "Content",
@@ -2792,6 +2793,253 @@ async function createDropdownMenu(lang: "ar" | "en"): Promise<ComponentNode> {
   return component;
 }
 
+// ============================================================================
+// Accordion Component (shadcn/ui style)
+// ============================================================================
+
+async function createAccordionItemVariant(config: {
+  state: "Collapsed" | "Expanded";
+  lang: "ar" | "en";
+}): Promise<ComponentNode> {
+  const { state, lang } = config;
+  const colors = getColors();
+  const isExpanded = state === "Expanded";
+
+  const component = figma.createComponent();
+  component.name = buildComponentName("Accordion Item", { state, lang });
+
+  // Main container
+  component.layoutMode = "VERTICAL";
+  component.primaryAxisSizingMode = "AUTO";
+  component.counterAxisSizingMode = "FIXED";
+  component.resize(400, 1);
+  component.itemSpacing = 0;
+  component.fills = [];
+
+  // Header row
+  const header = figma.createFrame();
+  header.name = "Header";
+  header.layoutMode = "HORIZONTAL";
+  header.primaryAxisSizingMode = "AUTO";
+  header.counterAxisSizingMode = "AUTO";
+  header.layoutAlign = "STRETCH";
+  header.paddingTop = 16;
+  header.paddingBottom = 16;
+  header.paddingLeft = 0;
+  header.paddingRight = 0;
+  header.primaryAxisAlignItems = "SPACE_BETWEEN";
+  header.counterAxisAlignItems = "CENTER";
+  header.fills = [];
+
+  // Title text
+  const titleFont = lang === "ar"
+    ? await ensureFont("Cairo", "Medium")
+    : await ensureFont("Inter", "Medium");
+
+  const title = figma.createText();
+  title.fontName = titleFont;
+  title.characters = lang === "ar" ? "معلومات المنتج" : "Product Information";
+  title.fontSize = 15;
+  title.fills = [{ type: "SOLID", color: colors.text }];
+  title.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  safeAppend(header, title);
+
+  // Chevron icon (rotated when expanded)
+  const chevronFrame = figma.createFrame();
+  chevronFrame.name = "Chevron";
+  chevronFrame.resize(20, 20);
+  chevronFrame.fills = [];
+
+  // Create chevron using lines
+  const chevron = figma.createVector();
+  chevron.resize(12, 7);
+  chevron.x = 4;
+  chevron.y = 6.5;
+  chevron.strokeWeight = 1.5;
+  chevron.strokeCap = "ROUND";
+  chevron.strokeJoin = "ROUND";
+  chevron.strokes = [{ type: "SOLID", color: colors.muted }];
+  chevron.fills = [];
+  
+  // Chevron path (down arrow)
+  chevron.vectorPaths = [{
+    windingRule: "NONZERO",
+    data: "M 0 0 L 6 6 L 12 0"
+  }];
+
+  // Rotate if expanded
+  if (isExpanded) {
+    chevronFrame.rotation = 180;
+  }
+
+  safeAppend(chevronFrame, chevron);
+
+  if (lang === "ar") {
+    safeAppend(header, chevronFrame);
+    safeAppend(header, title);
+  } else {
+    safeAppend(header, title);
+    safeAppend(header, chevronFrame);
+  }
+
+  safeAppend(component, header);
+
+  // Content (only visible when expanded)
+  if (isExpanded) {
+    const content = figma.createFrame();
+    content.name = "Content";
+    content.layoutMode = "VERTICAL";
+    content.primaryAxisSizingMode = "AUTO";
+    content.counterAxisSizingMode = "AUTO";
+    content.layoutAlign = "STRETCH";
+    content.paddingBottom = 16;
+    content.fills = [];
+
+    const contentFont = await getFontForLanguage(lang);
+    const contentText = figma.createText();
+    contentText.fontName = contentFont;
+    contentText.characters = lang === "ar"
+      ? "هذا هو محتوى الأكورديون. يمكنك إضافة أي نص أو عناصر هنا."
+      : "This is the accordion content. You can add any text or elements here.";
+    contentText.fontSize = 14;
+    contentText.lineHeight = { value: 22, unit: "PIXELS" };
+    contentText.fills = [{ type: "SOLID", color: colors.muted }];
+    contentText.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+    contentText.layoutAlign = "STRETCH";
+    contentText.textAutoResize = "HEIGHT";
+    safeAppend(content, contentText);
+
+    safeAppend(component, content);
+  }
+
+  // Bottom border
+  const border = figma.createFrame();
+  border.name = "Border";
+  border.resize(400, 1);
+  border.layoutAlign = "STRETCH";
+  border.fills = [{ type: "SOLID", color: colors.border }];
+
+  safeAppend(component, border);
+
+  return component;
+}
+
+async function createAccordionComponentSet(
+  lang: "ar" | "en"
+): Promise<ComponentSetNode> {
+  const states: Array<"Collapsed" | "Expanded"> = ["Collapsed", "Expanded"];
+  const variants: ComponentNode[] = [];
+
+  for (const state of states) {
+    const variant = await createAccordionItemVariant({ state, lang });
+    variants.push(variant);
+  }
+
+  const componentSet = figma.combineAsVariants(variants, figma.currentPage);
+  componentSet.name = `Accordion Item / ${lang === "ar" ? "AR" : "EN"}`;
+
+  componentSet.layoutMode = "VERTICAL";
+  componentSet.primaryAxisSizingMode = "AUTO";
+  componentSet.counterAxisSizingMode = "AUTO";
+  componentSet.itemSpacing = 40;
+  componentSet.paddingTop = 20;
+  componentSet.paddingBottom = 20;
+  componentSet.paddingLeft = 20;
+  componentSet.paddingRight = 20;
+  componentSet.fills = [{ type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.98 } }];
+  componentSet.cornerRadius = 8;
+
+  return componentSet;
+}
+
+async function createAccordionGroup(lang: "ar" | "en"): Promise<ComponentNode> {
+  const colors = getColors();
+
+  const component = figma.createComponent();
+  component.name = buildComponentName("Accordion", { lang });
+
+  // Main container
+  component.layoutMode = "VERTICAL";
+  component.primaryAxisSizingMode = "AUTO";
+  component.counterAxisSizingMode = "FIXED";
+  component.resize(400, 1);
+  component.itemSpacing = 0;
+  component.fills = [{ type: "SOLID", color: colors.white }];
+
+  // Accordion items data
+  const items = lang === "ar"
+    ? ["معلومات المنتج", "تفاصيل الشحن", "سياسة الإرجاع"]
+    : ["Product Information", "Shipping Details", "Return Policy"];
+
+  const titleFont = lang === "ar"
+    ? await ensureFont("Cairo", "Medium")
+    : await ensureFont("Inter", "Medium");
+
+  for (let i = 0; i < items.length; i++) {
+    const itemFrame = figma.createFrame();
+    itemFrame.name = items[i];
+    itemFrame.layoutMode = "HORIZONTAL";
+    itemFrame.primaryAxisSizingMode = "AUTO";
+    itemFrame.counterAxisSizingMode = "AUTO";
+    itemFrame.layoutAlign = "STRETCH";
+    itemFrame.paddingTop = 16;
+    itemFrame.paddingBottom = 16;
+    itemFrame.primaryAxisAlignItems = "SPACE_BETWEEN";
+    itemFrame.counterAxisAlignItems = "CENTER";
+    itemFrame.fills = [];
+
+    // Title
+    const title = figma.createText();
+    title.fontName = titleFont;
+    title.characters = items[i];
+    title.fontSize = 15;
+    title.fills = [{ type: "SOLID", color: colors.text }];
+
+    // Chevron
+    const chevronFrame = figma.createFrame();
+    chevronFrame.name = "Chevron";
+    chevronFrame.resize(20, 20);
+    chevronFrame.fills = [];
+
+    const chevron = figma.createVector();
+    chevron.resize(12, 7);
+    chevron.x = 4;
+    chevron.y = 6.5;
+    chevron.strokeWeight = 1.5;
+    chevron.strokeCap = "ROUND";
+    chevron.strokeJoin = "ROUND";
+    chevron.strokes = [{ type: "SOLID", color: colors.muted }];
+    chevron.fills = [];
+    chevron.vectorPaths = [{
+      windingRule: "NONZERO",
+      data: "M 0 0 L 6 6 L 12 0"
+    }];
+    safeAppend(chevronFrame, chevron);
+
+    if (lang === "ar") {
+      safeAppend(itemFrame, chevronFrame);
+      safeAppend(itemFrame, title);
+    } else {
+      safeAppend(itemFrame, title);
+      safeAppend(itemFrame, chevronFrame);
+    }
+
+    safeAppend(component, itemFrame);
+
+    // Add border (except for last item)
+    if (i < items.length - 1) {
+      const border = figma.createFrame();
+      border.name = "Border";
+      border.resize(400, 1);
+      border.layoutAlign = "STRETCH";
+      border.fills = [{ type: "SOLID", color: colors.border }];
+      safeAppend(component, border);
+    }
+  }
+
+  return component;
+}
+
 async function createSearchInputVariant(config: {
   state: "Default" | "Focus";
   size: "Small" | "Medium" | "Large";
@@ -3102,6 +3350,9 @@ figma.ui.onmessage = async (msg) => {
             break;
           case "dropdown":
             componentSet = await createDropdownMenu(lang);
+            break;
+          case "accordion":
+            componentSet = await createAccordionGroup(lang);
             break;
 
           // Content
