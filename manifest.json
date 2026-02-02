@@ -10,5 +10,9 @@
   "editorType": ["figma"],
   "networkAccess": {
     "allowedDomains": ["none"]
-  }
+  },
+  "relaunchButtons": [
+    {"command": "open", "name": "Open UI Make"},
+    {"command": "regenerate", "name": "Regenerate Component", "multipleSelection": false}
+  ]
 }

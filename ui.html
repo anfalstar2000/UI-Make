@@ -1,663 +1,993 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        font-family: Inter, system-ui, -apple-system, sans-serif;
-        padding: 16px;
-        margin: 0;
-        background: #fff;
-      }
-      h3 {
-        margin: 0 0 16px;
-        font-size: 18px;
-        font-weight: 600;
-        color: #111;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .tabs {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 16px;
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 8px;
-      }
-      .tab {
-        padding: 8px 12px;
-        font-size: 12px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        border-radius: 6px;
-        color: #666;
-        font-weight: 500;
-      }
-      .tab.active {
-        background: #3c986f;
-        color: #fff;
-      }
-      .tab-content { display: none; }
-      .tab-content.active { display: block; }
-      .form-group { margin: 12px 0; }
-      label {
-        display: block;
-        font-size: 11px;
-        font-weight: 500;
-        margin-bottom: 4px;
-        color: #333;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      select, input[type="text"] {
-        width: 100%;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 10px;
-        font-size: 13px;
-        outline: none;
-        background: #fff;
-        color: #111;
-      }
-      select:focus, input[type="text"]:focus {
-        border-color: #3c986f;
-      }
-      .color-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 8px 0;
-      }
-      .color-row label {
-        margin: 0;
-        min-width: 70px;
-        text-transform: none;
-        font-size: 12px;
-      }
-      input[type="color"] {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 2px;
-        cursor: pointer;
-      }
-      .color-hex {
-        flex: 1;
-        padding: 8px;
-        font-size: 12px;
-        font-family: monospace;
-      }
-      .checkbox-group {
-        display: flex;
-        align-items: center;
-        margin: 12px 0;
-      }
-      .checkbox-group input { margin-right: 8px; cursor: pointer; }
-      .checkbox-group label {
-        margin: 0;
-        font-size: 13px;
-        cursor: pointer;
-        font-weight: normal;
-        text-transform: none;
-      }
-      .hidden { display: none; }
-      .error-message {
-        display: none;
-        padding: 10px;
-        margin: 12px 0;
-        background: #fee;
-        border: 1px solid #fcc;
-        border-radius: 6px;
-        color: #c00;
-        font-size: 12px;
-      }
-      .error-message.show { display: block; }
-      .success-message {
-        display: none;
-        padding: 10px;
-        margin: 12px 0;
-        background: #efe;
-        border: 1px solid #cfc;
-        border-radius: 6px;
-        color: #060;
-        font-size: 12px;
-      }
-      .success-message.show { display: block; }
-      .btn-row { display: flex; gap: 8px; margin-top: 16px; }
-      button {
-        flex: 1;
-        padding: 12px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      button.primary { background: #3c986f; color: #fff; }
-      button.primary:hover { background: #2d7a56; }
-      button.secondary { background: #f0f0f0; color: #333; }
-      button.secondary:hover { background: #e0e0e0; }
-      button:disabled { background: #ccc; cursor: not-allowed; }
-      .section-title {
-        font-size: 11px;
-        font-weight: 600;
-        color: #999;
-        margin: 16px 0 8px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-    </style>
-  </head>
-  <body>
-    <h3>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3c986f" stroke-width="2">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+    
+    :root {
+      --primary: #18181B;
+      --primary-hover: #27272A;
+      --accent: #2563EB;
+      --accent-light: #EFF6FF;
+      --text: #18181B;
+      --text-muted: #71717A;
+      --border: #E4E4E7;
+      --bg: #FFFFFF;
+      --bg-subtle: #FAFAFA;
+      --radius: 8px;
+      --radius-sm: 6px;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+    }
+    
+    .header-icon {
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .header-icon svg {
+      width: 14px;
+      height: 14px;
+      color: white;
+    }
+    
+    .header-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .header-tabs {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .header-tab {
+      padding: 4px 10px;
+      font-size: 11px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+    }
+    
+    .header-tab:hover {
+      background: var(--bg-subtle);
+    }
+    
+    .header-tab.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    
+    /* Main Content */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    
+    /* Search */
+    .search-box {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 10px 12px 10px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      outline: none;
+      background: var(--bg);
+    }
+    
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    
+    /* Category Tabs */
+    .categories {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    
+    .category-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    
+    .category-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+    
+    .category-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    
+    /* Component Grid */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .component-card {
+      padding: 12px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    
+    .component-card:hover {
+      border-color: var(--text-muted);
+      background: var(--bg-subtle);
+    }
+    
+    .component-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .component-icon {
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+    
+    .component-card:hover .component-icon {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .component-card.selected .component-icon {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .component-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .component-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    /* Options Panel */
+    .options-panel {
+      background: var(--bg-subtle);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    
+    .options-panel.show {
+      display: block;
+    }
+    
+    .options-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    
+    .options-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .options-row:last-child {
+      margin-bottom: 0;
+    }
+    
+    .options-label {
+      font-size: 12px;
+      color: var(--text);
+      min-width: 50px;
+    }
+    
+    .options-group {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+    
+    .option-btn {
+      flex: 1;
+      padding: 6px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    
+    .option-btn:hover {
+      border-color: var(--text-muted);
+    }
+    
+    .option-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    
+    .option-select {
+      flex: 1;
+      padding: 6px 8px;
+      font-size: 11px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      cursor: pointer;
+      outline: none;
+    }
+    
+    .option-select:focus {
+      border-color: var(--accent);
+    }
+    
+    /* Footer */
+    .footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    
+    .generate-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .generate-btn:hover {
+      background: var(--primary-hover);
+    }
+    
+    .generate-btn:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+    
+    /* Messages */
+    .message {
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    
+    .message.show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .message.success {
+      background: #ECFDF5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+    
+    .message.error {
+      background: #FEF2F2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+    
+    /* Colors Panel */
+    .colors-panel {
+      display: none;
+    }
+    
+    .colors-panel.show {
+      display: block;
+    }
+    
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+    }
+    
+    .color-preview {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    
+    .color-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .color-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .color-hex {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+    
+    /* Tokens Panel */
+    .tokens-panel {
+      display: none;
+    }
+    
+    .tokens-panel.show {
+      display: block;
+    }
+    
+    .token-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+    }
+    
+    .token-check {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+    
+    .token-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    /* Hidden inputs */
+    input[type="color"] {
+      width: 24px;
+      height: 24px;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="3" width="18" height="18" rx="2"/>
         <path d="M3 9h18M9 21V9"/>
       </svg>
-      UI Make
-    </h3>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="components">Components</button>
-      <button class="tab" data-tab="colors">Colors</button>
-      <button class="tab" data-tab="tokens">Tokens</button>
     </div>
-
-    <!-- Components Tab -->
-    <div class="tab-content active" id="components">
-      <div class="form-group">
-        <label>Component:</label>
-        <select id="component">
-          <optgroup label="Buttons">
-            <option value="button">Button</option>
-            <option value="icon-button">Icon Button</option>
-          </optgroup>
-          <optgroup label="Navigation">
-            <option value="navbar">Navbar</option>
-            <option value="sidebar-item">Sidebar Item</option>
-            <option value="tab">Tab</option>
-            <option value="breadcrumbs">Breadcrumbs</option>
-            <option value="pagination">Pagination</option>
-          </optgroup>
-          <optgroup label="Forms">
-            <option value="text-input">Text Input</option>
-            <option value="search-input">Search Input</option>
-            <option value="select">Select</option>
-            <option value="checkbox">Checkbox</option>
-            <option value="toggle">Toggle</option>
-            <option value="date-picker">Date Picker</option>
-            <option value="stepper">Stepper</option>
-          </optgroup>
-          <optgroup label="Feedback">
-            <option value="alert">Alert</option>
-            <option value="toast">Toast</option>
-            <option value="loading-spinner">Loading Spinner</option>
-            <option value="progress-bar">Progress Bar</option>
-            <option value="tooltip">Tooltip</option>
-          </optgroup>
-          <optgroup label="Layout">
-            <option value="card">Card</option>
-            <option value="modal">Modal</option>
-            <option value="divider">Divider</option>
-            <option value="dropdown">Dropdown Menu</option>
-          </optgroup>
-          <optgroup label="Content">
-            <option value="faq">FAQ</option>
-            <option value="footer">Footer</option>
-            <option value="avatar">Avatar</option>
-            <option value="badge">Badge</option>
-          </optgroup>
-          <optgroup label="Icons">
-            <option value="icon">Icon (Quick Access)</option>
-          </optgroup>
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="iconCategoryGroup">
-        <label>Category:</label>
-        <select id="iconCategory">
-          <option value="navigation">Navigation</option>
-          <option value="communication">Communication</option>
-          <option value="actions">Actions</option>
-          <option value="media">Media</option>
-          <option value="system">System</option>
-          <option value="social">Social</option>
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="iconOptionGroup">
-        <label>Icon:</label>
-        <select id="iconOption">
-          <!-- Will be populated dynamically based on category -->
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="iconSizeGroup">
-        <label>Icon Size:</label>
-        <select id="iconSize">
-          <option value="16">16px</option>
-          <option value="20">20px</option>
-          <option value="24" selected>24px</option>
-          <option value="32">32px</option>
-          <option value="48">48px</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="sizeGroup">
-        <label>Size:</label>
-        <select id="size">
-          <option value="Small">Small</option>
-          <option value="Medium" selected>Medium</option>
-          <option value="Large">Large</option>
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="buttonTypeGroup">
-        <label>Button Type:</label>
-        <select id="buttonType">
-          <option value="Primary">Primary</option>
-          <option value="Secondary">Secondary</option>
-          <option value="Ghost">Ghost</option>
-          <option value="Danger">Danger</option>
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="buttonStateGroup">
-        <label>State:</label>
-        <select id="buttonState">
-          <option value="Default">Default</option>
-          <option value="Hover">Hover</option>
-          <option value="Disabled">Disabled</option>
-          <option value="Loading">Loading</option>
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="buttonShapeGroup">
-        <label>Shape:</label>
-        <select id="buttonShape">
-          <option value="Default">Default</option>
-          <option value="Capsule">Capsule</option>
-        </select>
-      </div>
-
-      <div class="form-group hidden" id="buttonIconGroup">
-        <label>Icon:</label>
-        <select id="buttonIcon">
-          <option value="None">None</option>
-          <option value="ri-home-line">Home</option>
-          <option value="ri-search-line">Search</option>
-          <option value="ri-user-line">User</option>
-          <option value="ri-menu-line">Menu</option>
-          <option value="ri-close-line">Close</option>
-          <option value="ri-arrow-right-line">Arrow Right</option>
-          <option value="ri-arrow-left-line">Arrow Left</option>
-          <option value="ri-check-line">Check</option>
-          <option value="ri-calendar-line">Calendar</option>
-          <option value="ri-settings-line">Settings</option>
-          <option value="ri-heart-line">Heart</option>
-          <option value="ri-star-line">Star</option>
-          <option value="ri-notification-line">Notification</option>
-          <option value="ri-mail-line">Mail</option>
-          <option value="ri-phone-line">Phone</option>
-          <option value="ri-download-line">Download</option>
-          <option value="ri-upload-line">Upload</option>
-          <option value="ri-share-line">Share</option>
-          <option value="ri-edit-line">Edit</option>
-          <option value="ri-delete-line">Delete</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Language:</label>
-        <select id="lang">
-          <option value="en">English</option>
-          <option value="ar">Arabic (RTL)</option>
-        </select>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="createAsComponents" checked />
-        <label for="createAsComponents">Create as Components</label>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="stackVertically" checked />
-        <label for="stackVertically">Stack outputs vertically</label>
-      </div>
+    <span class="header-title">UI Make</span>
+    <div class="header-tabs">
+      <button class="header-tab active" data-panel="components">Components</button>
+      <button class="header-tab" data-panel="colors">Colors</button>
+      <button class="header-tab" data-panel="tokens">Tokens</button>
     </div>
-
-    <!-- Colors Tab -->
-    <div class="tab-content" id="colors">
-      <p class="section-title">Theme Colors</p>
-
-      <div class="color-row">
-        <label>Primary:</label>
-        <input type="color" id="colorPrimary" value="#3C986F" />
-        <input type="text" class="color-hex" id="hexPrimary" value="#3C986F" />
-      </div>
-
-      <div class="color-row">
-        <label>Danger:</label>
-        <input type="color" id="colorDanger" value="#D92D20" />
-        <input type="text" class="color-hex" id="hexDanger" value="#D92D20" />
-      </div>
-
-      <div class="color-row">
-        <label>Warning:</label>
-        <input type="color" id="colorWarning" value="#F59E0B" />
-        <input type="text" class="color-hex" id="hexWarning" value="#F59E0B" />
-      </div>
-
-      <div class="color-row">
-        <label>Success:</label>
-        <input type="color" id="colorSuccess" value="#10B981" />
-        <input type="text" class="color-hex" id="hexSuccess" value="#10B981" />
-      </div>
-
-      <div class="color-row">
-        <label>Info:</label>
-        <input type="color" id="colorInfo" value="#3B82F6" />
-        <input type="text" class="color-hex" id="hexInfo" value="#3B82F6" />
-      </div>
-
-      <p class="section-title">Text & Border</p>
-
-      <div class="color-row">
-        <label>Text:</label>
-        <input type="color" id="colorText" value="#111111" />
-        <input type="text" class="color-hex" id="hexText" value="#111111" />
-      </div>
-
-      <div class="color-row">
-        <label>Muted:</label>
-        <input type="color" id="colorMuted" value="#666666" />
-        <input type="text" class="color-hex" id="hexMuted" value="#666666" />
-      </div>
-
-      <div class="color-row">
-        <label>Border:</label>
-        <input type="color" id="colorBorder" value="#E5E7EB" />
-        <input type="text" class="color-hex" id="hexBorder" value="#E5E7EB" />
-      </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Messages -->
+    <div class="message success" id="successMsg">
+      <span>✓</span>
+      <span id="successText">Created successfully!</span>
     </div>
-
-    <!-- Tokens Tab -->
-    <div class="tab-content" id="tokens">
-      <p class="section-title">Generate Design Tokens</p>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="tokenColors" checked />
-        <label for="tokenColors">Color Styles</label>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="tokenText" checked />
-        <label for="tokenText">Text Styles</label>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="tokenEffects" checked />
-        <label for="tokenEffects">Effect Styles (Shadows)</label>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="tokenSpacing" checked />
-        <label for="tokenSpacing">Spacing Variables</label>
-      </div>
-
-      <div class="btn-row">
-        <button class="primary" id="generateTokens">Generate Tokens</button>
-      </div>
+    <div class="message error" id="errorMsg">
+      <span>✕</span>
+      <span id="errorText">Error occurred</span>
     </div>
-
-    <div class="error-message" id="errorMessage"></div>
-    <div class="success-message" id="successMessage"></div>
-
-    <div class="btn-row" id="mainButtons">
-      <button class="primary" id="generate">Generate</button>
-      <button class="secondary" id="cancel">Cancel</button>
-    </div>
-
-    <script>
-      // Tab switching
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          tab.classList.add('active');
-          document.getElementById(tab.dataset.tab).classList.add('active');
-
-          // Show/hide main buttons based on tab
-          const mainBtns = document.getElementById('mainButtons');
-          mainBtns.style.display = tab.dataset.tab === 'tokens' ? 'none' : 'flex';
-        });
-      });
-
-      // Color picker sync
-      const colorInputs = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Text', 'Muted', 'Border'];
-      colorInputs.forEach(name => {
-        const picker = document.getElementById('color' + name);
-        const hex = document.getElementById('hex' + name);
-
-        picker.addEventListener('input', () => {
-          hex.value = picker.value.toUpperCase();
-        });
-
-        hex.addEventListener('input', () => {
-          if (/^#[0-9A-Fa-f]{6}$/.test(hex.value)) {
-            picker.value = hex.value;
-          }
-        });
-      });
-
-      const componentSelect = document.getElementById("component");
-      const sizeGroup = document.getElementById("sizeGroup");
-      const errorMessage = document.getElementById("errorMessage");
-      const successMessage = document.getElementById("successMessage");
-
-      const sizeComponents = [
-        "button", "icon-button", "text-input", "search-input", "select",
-        "loading-spinner", "modal", "avatar", "progress-bar", "stepper"
-      ];
-
-      const buttonTypeGroup = document.getElementById("buttonTypeGroup");
-
-      function updateSizeVisibility() {
-        sizeGroup.classList.toggle("hidden", !sizeComponents.includes(componentSelect.value));
-      }
-
-      function updateButtonTypeVisibility() {
-        const isButton = componentSelect.value === "button";
-        buttonTypeGroup.classList.toggle("hidden", !isButton);
-        document.getElementById("buttonStateGroup").classList.toggle("hidden", !isButton);
-        document.getElementById("buttonShapeGroup").classList.toggle("hidden", !isButton);
-        document.getElementById("buttonIconGroup").classList.toggle("hidden", !isButton);
-      }
-
-      // Icon category and options
-      const iconCategoryGroup = document.getElementById("iconCategoryGroup");
-      const iconOptionGroup = document.getElementById("iconOptionGroup");
-      const iconSizeGroup = document.getElementById("iconSizeGroup");
-      const iconCategory = document.getElementById("iconCategory");
-      const iconOption = document.getElementById("iconOption");
-
-      // Icon options by category
-      const iconOptions = {
-        navigation: [
-          { value: "ri-home-line", label: "Home" },
-          { value: "ri-menu-line", label: "Menu" },
-          { value: "ri-arrow-right-line", label: "Arrow Right" },
-          { value: "ri-arrow-left-line", label: "Arrow Left" },
-          { value: "ri-arrow-up-line", label: "Arrow Up" },
-          { value: "ri-arrow-down-line", label: "Arrow Down" },
-          { value: "ri-close-line", label: "Close" },
-          { value: "ri-search-line", label: "Search" }
-        ],
-        communication: [
-          { value: "ri-mail-line", label: "Mail" },
-          { value: "ri-phone-line", label: "Phone" },
-          { value: "ri-notification-line", label: "Notification" },
-          { value: "ri-message-line", label: "Message" },
-          { value: "ri-chat-line", label: "Chat" },
-          { value: "ri-send-line", label: "Send" }
-        ],
-        actions: [
-          { value: "ri-check-line", label: "Check" },
-          { value: "ri-edit-line", label: "Edit" },
-          { value: "ri-delete-line", label: "Delete" },
-          { value: "ri-download-line", label: "Download" },
-          { value: "ri-upload-line", label: "Upload" },
-          { value: "ri-share-line", label: "Share" },
-          { value: "ri-settings-line", label: "Settings" },
-          { value: "ri-filter-line", label: "Filter" }
-        ],
-        media: [
-          { value: "ri-image-line", label: "Image" },
-          { value: "ri-video-line", label: "Video" },
-          { value: "ri-camera-line", label: "Camera" },
-          { value: "ri-mic-line", label: "Microphone" },
-          { value: "ri-play-line", label: "Play" },
-          { value: "ri-pause-line", label: "Pause" }
-        ],
-        system: [
-          { value: "ri-user-line", label: "User" },
-          { value: "ri-calendar-line", label: "Calendar" },
-          { value: "ri-time-line", label: "Time" },
-          { value: "ri-file-line", label: "File" },
-          { value: "ri-folder-line", label: "Folder" },
-          { value: "ri-link-line", label: "Link" }
-        ],
-        social: [
-          { value: "ri-heart-line", label: "Heart" },
-          { value: "ri-star-line", label: "Star" },
-          { value: "ri-bookmark-line", label: "Bookmark" },
-          { value: "ri-thumb-up-line", label: "Thumb Up" },
-          { value: "ri-thumb-down-line", label: "Thumb Down" }
-        ]
-      };
-
-      function updateIconVisibility() {
-        const isIcon = componentSelect.value === "icon";
-        iconCategoryGroup.classList.toggle("hidden", !isIcon);
-        iconOptionGroup.classList.toggle("hidden", !isIcon);
-        iconSizeGroup.classList.toggle("hidden", !isIcon);
-        if (isIcon) {
-          updateIconOptions();
-        }
-      }
-
-      function updateIconOptions() {
-        const category = iconCategory.value;
-        const options = iconOptions[category] || [];
-        iconOption.innerHTML = "";
-        options.forEach(opt => {
-          const option = document.createElement("option");
-          option.value = opt.value;
-          option.textContent = opt.label;
-          iconOption.appendChild(option);
-        });
-      }
-
-      iconCategory.addEventListener("change", updateIconOptions);
-
-      componentSelect.addEventListener("change", () => {
-        updateSizeVisibility();
-        updateButtonTypeVisibility();
-        updateIconVisibility();
-      });
-      updateSizeVisibility();
-      updateButtonTypeVisibility();
-      updateIconVisibility();
-
-      function getColors() {
-        return {
-          primary: document.getElementById('hexPrimary').value,
-          danger: document.getElementById('hexDanger').value,
-          warning: document.getElementById('hexWarning').value,
-          success: document.getElementById('hexSuccess').value,
-          info: document.getElementById('hexInfo').value,
-          text: document.getElementById('hexText').value,
-          muted: document.getElementById('hexMuted').value,
-          border: document.getElementById('hexBorder').value
-        };
-      }
-
-      function showSuccess(msg) {
-        successMessage.textContent = msg;
-        successMessage.classList.add('show');
-        setTimeout(() => successMessage.classList.remove('show'), 3000);
-      }
-
-      function showError(msg) {
-        errorMessage.textContent = msg;
-        errorMessage.classList.add('show');
-        setTimeout(() => errorMessage.classList.remove('show'), 5000);
-      }
-
-      window.onmessage = (event) => {
-        const msg = event.data?.pluginMessage;
-        if (!msg) return;
-        if (msg.type === "ERROR") showError(msg.error);
-        else if (msg.type === "SUCCESS") showSuccess(msg.message || "Created successfully!");
-      };
-
-      document.getElementById("generate").onclick = () => {
-        const isButton = componentSelect.value === "button";
-        const isIcon = componentSelect.value === "icon";
-        const buttonType = isButton ? (document.getElementById("buttonType")?.value || "Primary") : undefined;
-        const buttonState = isButton ? (document.getElementById("buttonState")?.value || "Default") : undefined;
-        const buttonShape = isButton ? (document.getElementById("buttonShape")?.value || "Default") : undefined;
-        const buttonIcon = isButton ? (document.getElementById("buttonIcon")?.value || "None") : undefined;
-        const iconCategory = isIcon ? (document.getElementById("iconCategory")?.value || "navigation") : undefined;
-        const iconOption = isIcon ? (document.getElementById("iconOption")?.value || "") : undefined;
-        const iconSize = isIcon ? (parseInt(document.getElementById("iconSize")?.value || "24")) : undefined;
+    
+    <!-- Components Panel -->
+    <div class="components-panel" id="componentsPanel">
+      <!-- Search -->
+      <div class="search-box">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search components..." />
+      </div>
+      
+      <!-- Categories -->
+      <div class="categories" id="categories">
+        <button class="category-btn active" data-category="all">All</button>
+        <button class="category-btn" data-category="buttons">Buttons</button>
+        <button class="category-btn" data-category="forms">Forms</button>
+        <button class="category-btn" data-category="navigation">Navigation</button>
+        <button class="category-btn" data-category="feedback">Feedback</button>
+        <button class="category-btn" data-category="layout">Layout</button>
+        <button class="category-btn" data-category="content">Content</button>
+      </div>
+      
+      <!-- Component Grid -->
+      <div class="components-grid" id="componentsGrid">
+        <!-- Will be populated by JS -->
+      </div>
+      
+      <!-- Options Panel -->
+      <div class="options-panel" id="optionsPanel">
+        <div class="options-title">Options</div>
         
-        parent.postMessage({
-          pluginMessage: {
-            type: "GENERATE_COMPONENT",
-            payload: {
-              component: componentSelect.value,
-              lang: document.getElementById("lang").value,
-              size: document.getElementById("size").value,
-              buttonType: buttonType,
-              buttonState: buttonState,
-              buttonShape: buttonShape,
-              buttonIcon: buttonIcon,
-              iconCategory: iconCategory,
-              iconOption: iconOption,
-              iconSize: iconSize,
-              createAsComponents: document.getElementById("createAsComponents").checked,
-              stackVertically: document.getElementById("stackVertically").checked,
-              colors: getColors()
-            }
-          }
-        }, "*");
+        <div class="options-row" id="sizeRow">
+          <span class="options-label">Size</span>
+          <div class="options-group">
+            <button class="option-btn" data-size="Small">S</button>
+            <button class="option-btn active" data-size="Medium">M</button>
+            <button class="option-btn" data-size="Large">L</button>
+          </div>
+        </div>
+        
+        <div class="options-row" id="langRow">
+          <span class="options-label">Lang</span>
+          <div class="options-group">
+            <button class="option-btn active" data-lang="en">English</button>
+            <button class="option-btn" data-lang="ar">العربية</button>
+          </div>
+        </div>
+        
+        <div class="options-row hidden" id="typeRow">
+          <span class="options-label">Type</span>
+          <select class="option-select" id="typeSelect">
+            <option value="Primary">Primary</option>
+            <option value="Secondary">Secondary</option>
+            <option value="Ghost">Ghost</option>
+            <option value="Danger">Danger</option>
+          </select>
+        </div>
+        
+        <div class="options-row hidden" id="stateRow">
+          <span class="options-label">State</span>
+          <select class="option-select" id="stateSelect">
+            <option value="Default">Default</option>
+            <option value="Hover">Hover</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+        </div>
+        
+        <div class="options-row hidden" id="shapeRow">
+          <span class="options-label">Shape</span>
+          <div class="options-group">
+            <button class="option-btn active" data-shape="Default">Default</button>
+            <button class="option-btn" data-shape="Capsule">Capsule</button>
+          </div>
+        </div>
+        
+        <div class="options-row hidden" id="iconRow">
+          <span class="options-label">Icon</span>
+          <select class="option-select" id="iconSelect">
+            <option value="None">None</option>
+            <option value="ri-arrow-right-line">Arrow →</option>
+            <option value="ri-arrow-left-line">Arrow ←</option>
+            <option value="ri-check-line">Check ✓</option>
+            <option value="ri-close-line">Close ✕</option>
+            <option value="ri-plus-line">Plus +</option>
+            <option value="ri-search-line">Search</option>
+            <option value="ri-home-line">Home</option>
+            <option value="ri-user-line">User</option>
+            <option value="ri-settings-line">Settings</option>
+            <option value="ri-download-line">Download</option>
+            <option value="ri-upload-line">Upload</option>
+            <option value="ri-mail-line">Mail</option>
+            <option value="ri-heart-line">Heart</option>
+            <option value="ri-star-line">Star</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Colors Panel -->
+    <div class="colors-panel" id="colorsPanel">
+      <div class="options-title">Theme Colors</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorPrimary" value="#2563EB" />
+          <div class="color-info">
+            <div class="color-name">Primary</div>
+            <div class="color-hex" id="hexPrimary">#2563EB</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorDanger" value="#DC2626" />
+          <div class="color-info">
+            <div class="color-name">Danger</div>
+            <div class="color-hex" id="hexDanger">#DC2626</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorWarning" value="#F59E0B" />
+          <div class="color-info">
+            <div class="color-name">Warning</div>
+            <div class="color-hex" id="hexWarning">#F59E0B</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorSuccess" value="#10B981" />
+          <div class="color-info">
+            <div class="color-name">Success</div>
+            <div class="color-hex" id="hexSuccess">#10B981</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorInfo" value="#3B82F6" />
+          <div class="color-info">
+            <div class="color-name">Info</div>
+            <div class="color-hex" id="hexInfo">#3B82F6</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorText" value="#18181B" />
+          <div class="color-info">
+            <div class="color-name">Text</div>
+            <div class="color-hex" id="hexText">#18181B</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorMuted" value="#71717A" />
+          <div class="color-info">
+            <div class="color-name">Muted</div>
+            <div class="color-hex" id="hexMuted">#71717A</div>
+          </div>
+        </div>
+        <div class="color-item">
+          <input type="color" class="color-preview" id="colorBorder" value="#E4E4E7" />
+          <div class="color-info">
+            <div class="color-name">Border</div>
+            <div class="color-hex" id="hexBorder">#E4E4E7</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tokens Panel -->
+    <div class="tokens-panel" id="tokensPanel">
+      <div class="options-title">Generate Design Tokens</div>
+      <div class="token-item">
+        <input type="checkbox" class="token-check" id="tokenColors" checked />
+        <label class="token-label" for="tokenColors">Color Styles</label>
+      </div>
+      <div class="token-item">
+        <input type="checkbox" class="token-check" id="tokenText" checked />
+        <label class="token-label" for="tokenText">Text Styles</label>
+      </div>
+      <div class="token-item">
+        <input type="checkbox" class="token-check" id="tokenEffects" checked />
+        <label class="token-label" for="tokenEffects">Effect Styles (Shadows)</label>
+      </div>
+      <div class="token-item">
+        <input type="checkbox" class="token-check" id="tokenSpacing" checked />
+        <label class="token-label" for="tokenSpacing">Spacing Variables</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <div class="footer">
+    <button class="generate-btn" id="generateBtn" disabled>
+      <span>Select a component</span>
+    </button>
+  </div>
+  
+  <script>
+    // SVG Icons (RemixIcon paths)
+    const ICONS = {
+      button: '<path d="M4 6h16v12H4V6zm2 2v8h12V8H6z"/>',
+      'icon-button': '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>',
+      'text-input': '<path d="M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h10v2H4v-2z"/>',
+      'search-input': '<path d="M11 2c4.968 0 9 4.032 9 9s-4.032 9-9 9-9-4.032-9-9 4.032-9 9-9zm0 16c3.867 0 7-3.133 7-7 0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7zm8.485.071l2.829 2.828-1.415 1.415-2.828-2.829 1.414-1.414z"/>',
+      select: '<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/><path d="M17 8l3 3h-6l3-3zm0 8l-3 3h6l-3-3z"/>',
+      checkbox: '<path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm7.003 13l7.07-7.071-1.414-1.414-5.656 5.657-2.829-2.829-1.414 1.414L11.003 16z"/>',
+      toggle: '<path d="M8 7a5 5 0 0 0 0 10h8a5 5 0 0 0 0-10H8zm8 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>',
+      'date-picker': '<path d="M17 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2v2h6V1h2v2zm3 8H4v8h16v-8zm-5-6H9v2H7V5H4v4h16V5h-3v2h-2V5z"/>',
+      stepper: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>',
+      navbar: '<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/>',
+      'sidebar-item': '<path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm6 2H4v14h5V5z"/>',
+      tab: '<path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm17 8H4v8h16v-8zM4 5v4h4V5H4zm6 0v4h4V5h-4z"/>',
+      breadcrumbs: '<path d="M14 10l6 3-6 3v-6zm-4-5l6 3-6 3V5zM4 5l6 3-6 3V5z"/>',
+      pagination: '<path d="M5 11h14v2H5v-2zm-3-4h20v2H2V7zm6 8h8v2H8v-2z"/>',
+      alert: '<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/>',
+      toast: '<path d="M2 8.994A5.99 5.99 0 0 1 8 3h8c3.313 0 6 2.695 6 5.994V21H8c-3.313 0-6-2.695-6-5.994V8.994zM14 11v2h2v-2h-2zm-6 0v2h2v-2H8z"/>',
+      'loading-spinner': '<path d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm8.66-10a1 1 0 0 1-.366 1.366l-2.598 1.5a1 1 0 1 1-1-1.732l2.598-1.5A1 1 0 0 1 20.66 7zM7.304 14.134a1 1 0 0 1-.366 1.366l-2.598 1.5a1 1 0 1 1-1-1.732l2.598-1.5a1 1 0 0 1 1.366.366zM3.34 7a1 1 0 0 1 1.366-.366l2.598 1.5a1 1 0 1 1-1 1.732l-2.598-1.5A1 1 0 0 1 3.34 7zm13.356 7.134a1 1 0 0 1 1.366-.366l2.598 1.5a1 1 0 1 1-1 1.732l-2.598-1.5a1 1 0 0 1-.366-1.366z"/>',
+      'progress-bar': '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M12 6v6l4 2"/>',
+      tooltip: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>',
+      card: '<path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm1 2v14h16V5H4z"/>',
+      modal: '<path d="M3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm1 2v14h16V5H4zm6 6h4v2h-4v-2z"/>',
+      'alert-dialog': '<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.501 3.501 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2v-.645z"/>',
+      divider: '<path d="M2 11h20v2H2z"/>',
+      dropdown: '<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h12v2H3v-2zm14 0l3 3 3-3h-6z"/>',
+      faq: '<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645V14h-2v-1.5a1 1 0 0 1 1-1 1.5 1.5 0 1 0-1.471-1.794l-1.962-.393A3.501 3.501 0 1 1 13 13.355z"/>',
+      footer: '<path d="M3 19h18v2H3v-2zm0-7h18v5H3v-5zm0-7h18v5H3V5z"/>',
+      avatar: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>',
+      badge: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
+      icon: '<path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7-6.3-4.6L5.7 21l2.3-7-6-4.6h7.6L12 2z"/>',
+    };
+    
+    // Components data
+    const COMPONENTS = [
+      // Buttons
+      { id: 'button', name: 'Button', category: 'buttons', hasSize: true, hasType: true, hasState: true, hasIcon: true, hasShape: true },
+      { id: 'icon-button', name: 'Icon Btn', category: 'buttons', hasSize: true },
+      
+      // Forms
+      { id: 'text-input', name: 'Input', category: 'forms', hasSize: true },
+      { id: 'search-input', name: 'Search', category: 'forms', hasSize: true },
+      { id: 'select', name: 'Select', category: 'forms', hasSize: true },
+      { id: 'checkbox', name: 'Checkbox', category: 'forms' },
+      { id: 'toggle', name: 'Toggle', category: 'forms' },
+      { id: 'date-picker', name: 'Date', category: 'forms' },
+      { id: 'stepper', name: 'Stepper', category: 'forms' },
+      
+      // Navigation
+      { id: 'navbar', name: 'Navbar', category: 'navigation' },
+      { id: 'sidebar-item', name: 'Sidebar', category: 'navigation' },
+      { id: 'tab', name: 'Tabs', category: 'navigation' },
+      { id: 'breadcrumbs', name: 'Crumbs', category: 'navigation' },
+      { id: 'pagination', name: 'Pages', category: 'navigation' },
+      
+      // Feedback
+      { id: 'alert', name: 'Alert', category: 'feedback' },
+      { id: 'toast', name: 'Toast', category: 'feedback' },
+      { id: 'loading-spinner', name: 'Loader', category: 'feedback', hasSize: true },
+      { id: 'progress-bar', name: 'Progress', category: 'feedback' },
+      { id: 'tooltip', name: 'Tooltip', category: 'feedback' },
+      
+      // Layout
+      { id: 'card', name: 'Card', category: 'layout' },
+      { id: 'modal', name: 'Modal', category: 'layout', hasSize: true },
+      { id: 'alert-dialog', name: 'Dialog', category: 'layout' },
+      { id: 'divider', name: 'Divider', category: 'layout' },
+      { id: 'dropdown', name: 'Dropdown', category: 'layout' },
+      
+      // Content
+      { id: 'faq', name: 'FAQ', category: 'content' },
+      { id: 'footer', name: 'Footer', category: 'content' },
+      { id: 'avatar', name: 'Avatar', category: 'content', hasSize: true },
+      { id: 'badge', name: 'Badge', category: 'content' },
+      { id: 'icon', name: 'Icon', category: 'content', hasSize: true },
+    ];
+    
+    // State
+    let selectedComponent = null;
+    let selectedCategory = 'all';
+    let selectedSize = 'Medium';
+    let selectedLang = 'en';
+    let selectedShape = 'Default';
+    
+    // DOM Elements
+    const componentsGrid = document.getElementById('componentsGrid');
+    const optionsPanel = document.getElementById('optionsPanel');
+    const generateBtn = document.getElementById('generateBtn');
+    const searchInput = document.getElementById('searchInput');
+    const successMsg = document.getElementById('successMsg');
+    const errorMsg = document.getElementById('errorMsg');
+    
+    // Get SVG icon for component
+    function getIconSVG(id) {
+      const path = ICONS[id] || ICONS.icon;
+      return `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">${path}</svg>`;
+    }
+    
+    // Render components grid
+    function renderComponents() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filtered = COMPONENTS.filter(c => {
+        const matchesCategory = selectedCategory === 'all' || c.category === selectedCategory;
+        const matchesSearch = c.name.toLowerCase().includes(searchTerm) || c.id.includes(searchTerm);
+        return matchesCategory && matchesSearch;
+      });
+      
+      componentsGrid.innerHTML = filtered.map(c => `
+        <div class="component-card ${selectedComponent?.id === c.id ? 'selected' : ''}" data-id="${c.id}">
+          <div class="component-icon">${getIconSVG(c.id)}</div>
+          <div class="component-name">${c.name}</div>
+        </div>
+      `).join('');
+      
+      // Add click handlers
+      componentsGrid.querySelectorAll('.component-card').forEach(card => {
+        card.addEventListener('click', () => selectComponent(card.dataset.id));
+      });
+    }
+    
+    // Select component
+    function selectComponent(id) {
+      selectedComponent = COMPONENTS.find(c => c.id === id);
+      renderComponents();
+      updateOptionsPanel();
+      updateGenerateButton();
+    }
+    
+    // Update options panel
+    function updateOptionsPanel() {
+      if (!selectedComponent) {
+        optionsPanel.classList.remove('show');
+        return;
+      }
+      
+      optionsPanel.classList.add('show');
+      
+      // Show/hide rows based on component
+      document.getElementById('sizeRow').classList.toggle('hidden', !selectedComponent.hasSize);
+      document.getElementById('typeRow').classList.toggle('hidden', !selectedComponent.hasType);
+      document.getElementById('stateRow').classList.toggle('hidden', !selectedComponent.hasState);
+      document.getElementById('shapeRow').classList.toggle('hidden', !selectedComponent.hasShape);
+      document.getElementById('iconRow').classList.toggle('hidden', !selectedComponent.hasIcon);
+    }
+    
+    // Update generate button
+    function updateGenerateButton() {
+      if (selectedComponent) {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = `<span>✨</span> Generate ${selectedComponent.name}`;
+      } else {
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = 'Select a component';
+      }
+    }
+    
+    // Category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCategory = btn.dataset.category;
+        renderComponents();
+      });
+    });
+    
+    // Size buttons
+    document.querySelectorAll('[data-size]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedSize = btn.dataset.size;
+      });
+    });
+    
+    // Language buttons
+    document.querySelectorAll('[data-lang]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-lang]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedLang = btn.dataset.lang;
+      });
+    });
+    
+    // Shape buttons
+    document.querySelectorAll('[data-shape]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-shape]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedShape = btn.dataset.shape;
+      });
+    });
+    
+    // Search
+    searchInput.addEventListener('input', renderComponents);
+    
+    // Panel switching
+    document.querySelectorAll('.header-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.header-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        const panel = tab.dataset.panel;
+        document.getElementById('componentsPanel').classList.toggle('hidden', panel !== 'components');
+        document.getElementById('colorsPanel').classList.toggle('show', panel === 'colors');
+        document.getElementById('tokensPanel').classList.toggle('show', panel === 'tokens');
+        
+        // Update generate button
+        if (panel === 'tokens') {
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = '✨ Generate Tokens';
+        } else if (panel === 'colors') {
+          generateBtn.disabled = true;
+          generateBtn.innerHTML = 'Colors auto-apply';
+        } else {
+          updateGenerateButton();
+        }
+      });
+    });
+    
+    // Color inputs
+    document.querySelectorAll('input[type="color"]').forEach(input => {
+      input.addEventListener('input', () => {
+        const id = input.id.replace('color', 'hex');
+        document.getElementById(id).textContent = input.value.toUpperCase();
+      });
+    });
+    
+    // Get colors
+    function getColors() {
+      return {
+        primary: document.getElementById('colorPrimary').value,
+        danger: document.getElementById('colorDanger').value,
+        warning: document.getElementById('colorWarning').value,
+        success: document.getElementById('colorSuccess').value,
+        info: document.getElementById('colorInfo').value,
+        text: document.getElementById('colorText').value,
+        muted: document.getElementById('colorMuted').value,
+        border: document.getElementById('colorBorder').value,
       };
-
-      document.getElementById("generateTokens").onclick = () => {
+    }
+    
+    // Show messages
+    function showSuccess(msg) {
+      document.getElementById('successText').textContent = msg;
+      successMsg.classList.add('show');
+      setTimeout(() => successMsg.classList.remove('show'), 3000);
+    }
+    
+    function showError(msg) {
+      document.getElementById('errorText').textContent = msg;
+      errorMsg.classList.add('show');
+      setTimeout(() => errorMsg.classList.remove('show'), 5000);
+    }
+    
+    // Message handler
+    window.onmessage = (event) => {
+      const msg = event.data?.pluginMessage;
+      if (!msg) return;
+      if (msg.type === 'ERROR') showError(msg.error);
+      else if (msg.type === 'SUCCESS') showSuccess(msg.message || 'Created successfully!');
+    };
+    
+    // Generate button
+    generateBtn.addEventListener('click', () => {
+      const activeTab = document.querySelector('.header-tab.active').dataset.panel;
+      
+      if (activeTab === 'tokens') {
         parent.postMessage({
           pluginMessage: {
-            type: "GENERATE_TOKENS",
+            type: 'GENERATE_TOKENS',
             payload: {
-              colors: document.getElementById("tokenColors").checked,
-              text: document.getElementById("tokenText").checked,
-              effects: document.getElementById("tokenEffects").checked,
-              spacing: document.getElementById("tokenSpacing").checked,
+              colors: document.getElementById('tokenColors').checked,
+              text: document.getElementById('tokenText').checked,
+              effects: document.getElementById('tokenEffects').checked,
+              spacing: document.getElementById('tokenSpacing').checked,
               colorValues: getColors()
             }
           }
-        }, "*");
-      };
-
-      document.getElementById("cancel").onclick = () => {
-        parent.postMessage({ pluginMessage: { type: "CANCEL" } }, "*");
-      };
-    </script>
-  </body>
+        }, '*');
+        return;
+      }
+      
+      if (!selectedComponent) return;
+      
+      parent.postMessage({
+        pluginMessage: {
+          type: 'GENERATE_COMPONENT',
+          payload: {
+            component: selectedComponent.id,
+            lang: selectedLang,
+            size: selectedSize,
+            buttonType: document.getElementById('typeSelect')?.value,
+            buttonState: document.getElementById('stateSelect')?.value,
+            buttonShape: selectedShape,
+            buttonIcon: document.getElementById('iconSelect')?.value,
+            colors: getColors()
+          }
+        }
+      }, '*');
+    });
+    
+    // Initialize
+    renderComponents();
+  </script>
+</body>
 </html>

@@ -1,9 +1,30 @@
 // ============================================================================
 // UI Make - Design System Generator
 // Comprehensive Figma Plugin for generating UI Kit components
+// Based on Figma Plugin API best practices
+// https://developers.figma.com/docs/plugins/
 // ============================================================================
 
-figma.showUI(__html__, { width: 320, height: 500 });
+// Handle relaunch commands from manifest.json
+const command = figma.command;
+
+if (command === "regenerate") {
+  // Regenerate component on selected node
+  const selection = figma.currentPage.selection;
+  if (selection.length > 0) {
+    figma.notify("Regenerate feature coming soon!");
+  } else {
+    figma.notify("Please select a component to regenerate", { error: true });
+  }
+  figma.closePlugin();
+} else {
+  // Default: open UI
+  figma.showUI(__html__, { 
+    width: 340, 
+    height: 520,
+    themeColors: true // Use Figma's theme colors
+  });
+}
 
 // ============================================================================
 // Constants & Configuration
@@ -32,11 +53,11 @@ function hexToRgb(hex: string): RGB {
 
 // Default colors (can be overridden)
 let THEME_COLORS = {
-  text: { r: 0.067, g: 0.067, b: 0.067 }, // #111
-  muted: { r: 0.4, g: 0.4, b: 0.4 }, // #666
-  border: { r: 0.898, g: 0.902, b: 0.922 }, // #E5E7EB
-  primary: { r: 0.235, g: 0.596, b: 0.435 }, // #3C986F
-  danger: { r: 0.851, g: 0.176, b: 0.125 }, // #D92D20
+  text: { r: 0.094, g: 0.094, b: 0.106 }, // #18181B
+  muted: { r: 0.443, g: 0.443, b: 0.478 }, // #71717A
+  border: { r: 0.894, g: 0.894, b: 0.906 }, // #E4E4E7
+  primary: { r: 0.145, g: 0.388, b: 0.922 }, // #2563EB (Blue)
+  danger: { r: 0.863, g: 0.149, b: 0.149 }, // #DC2626
   white: { r: 1, g: 1, b: 1 },
   success: { r: 0.063, g: 0.725, b: 0.506 }, // #10B981
   warning: { r: 0.961, g: 0.620, b: 0.043 }, // #F59E0B
@@ -48,10 +69,34 @@ function getColors() {
   return THEME_COLORS;
 }
 
+// Size configurations following design system best practices
 const SIZES = {
-  Small: { height: 32, padding: 8, fontSize: 12, iconSize: 16 },
-  Medium: { height: 40, padding: 12, fontSize: 14, iconSize: 20 },
-  Large: { height: 48, padding: 16, fontSize: 16, iconSize: 24 },
+  Small: { height: 32, padding: 12, fontSize: 13, iconSize: 16, gap: 6 },
+  Medium: { height: 40, padding: 16, fontSize: 14, iconSize: 18, gap: 8 },
+  Large: { height: 48, padding: 20, fontSize: 15, iconSize: 20, gap: 10 },
+};
+
+// Design tokens for consistent styling
+const DESIGN_TOKENS = {
+  radius: {
+    sm: 4,
+    md: 6,
+    lg: 8,
+    xl: 12,
+    full: 999,
+  },
+  shadow: {
+    sm: { x: 0, y: 1, blur: 2, spread: 0, opacity: 0.05 },
+    md: { x: 0, y: 4, blur: 6, spread: -1, opacity: 0.1 },
+    lg: { x: 0, y: 10, blur: 15, spread: -3, opacity: 0.1 },
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+  },
 };
 
 // ============================================================================
@@ -196,168 +241,456 @@ function createIcon(iconType: string, size: number, color: RGB): SceneNode {
   container.resize(size, size);
   container.fills = [];
   container.name = "icon";
+  container.clipsContent = true;
   
-  const strokeWidth = Math.max(1.5, size / 16);
-  const halfSize = size / 2;
+  const strokeWidth = Math.max(1.5, size / 12);
+  const padding = size * 0.15;
+  const innerSize = size - padding * 2;
   
   // Create icon based on type using simple shapes
-  if (iconType.includes("arrow-right") || iconType.includes("arrow-right-line")) {
-    // Right arrow: triangle pointing right
-    const arrow = figma.createPolygon();
-    arrow.resize(size * 0.6, size * 0.6);
-    arrow.x = size * 0.25;
-    arrow.y = size * 0.2;
-    arrow.pointCount = 3;
-    arrow.rotation = -90;
-    arrow.fills = [{ type: "SOLID", color }];
-    safeAppend(container, arrow);
-  } else if (iconType.includes("arrow-left") || iconType.includes("arrow-left-line")) {
-    // Left arrow: triangle pointing left
-    const arrow = figma.createPolygon();
-    arrow.resize(size * 0.6, size * 0.6);
-    arrow.x = size * 0.15;
-    arrow.y = size * 0.2;
-    arrow.pointCount = 3;
-    arrow.rotation = 90;
-    arrow.fills = [{ type: "SOLID", color }];
-    safeAppend(container, arrow);
-  } else if (iconType.includes("arrow-up") || iconType.includes("arrow-up-line")) {
-    // Up arrow: triangle pointing up
-    const arrow = figma.createPolygon();
-    arrow.resize(size * 0.6, size * 0.6);
-    arrow.x = size * 0.2;
-    arrow.y = size * 0.15;
-    arrow.pointCount = 3;
-    arrow.rotation = 180;
-    arrow.fills = [{ type: "SOLID", color }];
-    safeAppend(container, arrow);
-  } else if (iconType.includes("arrow-down") || iconType.includes("arrow-down-line")) {
-    // Down arrow: triangle pointing down
-    const arrow = figma.createPolygon();
-    arrow.resize(size * 0.6, size * 0.6);
-    arrow.x = size * 0.2;
-    arrow.y = size * 0.25;
-    arrow.pointCount = 3;
-    arrow.rotation = 0;
-    arrow.fills = [{ type: "SOLID", color }];
-    safeAppend(container, arrow);
-  } else if (iconType.includes("close") || iconType.includes("delete")) {
-    // X shape: two lines crossing
-    const line1 = figma.createLine();
-    line1.resize(size * 0.7, 0);
-    line1.x = size * 0.15;
-    line1.y = size * 0.15;
-    line1.rotation = Math.PI / 4;
-    line1.strokes = [{ type: "SOLID", color }];
-    line1.strokeWeight = strokeWidth;
+  if (iconType.includes("arrow-right") || iconType.includes("chevron-right")) {
+    // Right chevron: > shape
+    const line1 = figma.createRectangle();
+    line1.resize(innerSize * 0.5, strokeWidth);
+    line1.x = padding;
+    line1.y = size / 2 - innerSize * 0.2;
+    line1.rotation = 45;
+    line1.fills = [{ type: "SOLID", color }];
+    line1.cornerRadius = strokeWidth / 2;
     safeAppend(container, line1);
     
-    const line2 = figma.createLine();
-    line2.resize(size * 0.7, 0);
-    line2.x = size * 0.15;
-    line2.y = size * 0.85;
-    line2.rotation = -Math.PI / 4;
-    line2.strokes = [{ type: "SOLID", color }];
-    line2.strokeWeight = strokeWidth;
+    const line2 = figma.createRectangle();
+    line2.resize(innerSize * 0.5, strokeWidth);
+    line2.x = padding;
+    line2.y = size / 2 + innerSize * 0.2;
+    line2.rotation = -45;
+    line2.fills = [{ type: "SOLID", color }];
+    line2.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line2);
+  } else if (iconType.includes("arrow-left") || iconType.includes("chevron-left")) {
+    // Left chevron: < shape
+    const line1 = figma.createRectangle();
+    line1.resize(innerSize * 0.5, strokeWidth);
+    line1.x = size - padding - innerSize * 0.35;
+    line1.y = size / 2 - innerSize * 0.2;
+    line1.rotation = -45;
+    line1.fills = [{ type: "SOLID", color }];
+    line1.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line1);
+    
+    const line2 = figma.createRectangle();
+    line2.resize(innerSize * 0.5, strokeWidth);
+    line2.x = size - padding - innerSize * 0.35;
+    line2.y = size / 2 + innerSize * 0.2;
+    line2.rotation = 45;
+    line2.fills = [{ type: "SOLID", color }];
+    line2.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line2);
+  } else if (iconType.includes("arrow-up") || iconType.includes("chevron-up")) {
+    // Up chevron: ^ shape
+    const line1 = figma.createRectangle();
+    line1.resize(innerSize * 0.5, strokeWidth);
+    line1.x = size / 2 - innerSize * 0.35;
+    line1.y = size / 2;
+    line1.rotation = 45;
+    line1.fills = [{ type: "SOLID", color }];
+    line1.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line1);
+    
+    const line2 = figma.createRectangle();
+    line2.resize(innerSize * 0.5, strokeWidth);
+    line2.x = size / 2;
+    line2.y = size / 2;
+    line2.rotation = -45;
+    line2.fills = [{ type: "SOLID", color }];
+    line2.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line2);
+  } else if (iconType.includes("arrow-down") || iconType.includes("chevron-down")) {
+    // Down chevron: v shape
+    const line1 = figma.createRectangle();
+    line1.resize(innerSize * 0.5, strokeWidth);
+    line1.x = size / 2 - innerSize * 0.35;
+    line1.y = size / 2 - strokeWidth;
+    line1.rotation = -45;
+    line1.fills = [{ type: "SOLID", color }];
+    line1.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line1);
+    
+    const line2 = figma.createRectangle();
+    line2.resize(innerSize * 0.5, strokeWidth);
+    line2.x = size / 2;
+    line2.y = size / 2 - strokeWidth;
+    line2.rotation = 45;
+    line2.fills = [{ type: "SOLID", color }];
+    line2.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line2);
+  } else if (iconType.includes("close") || iconType.includes("delete")) {
+    // X shape: two rectangles crossing
+    const line1 = figma.createRectangle();
+    line1.resize(innerSize * 0.9, strokeWidth);
+    line1.x = padding + innerSize * 0.05;
+    line1.y = size / 2 - strokeWidth / 2;
+    line1.rotation = 45;
+    line1.fills = [{ type: "SOLID", color }];
+    line1.cornerRadius = strokeWidth / 2;
+    safeAppend(container, line1);
+    
+    const line2 = figma.createRectangle();
+    line2.resize(innerSize * 0.9, strokeWidth);
+    line2.x = padding + innerSize * 0.05;
+    line2.y = size / 2 - strokeWidth / 2;
+    line2.rotation = -45;
+    line2.fills = [{ type: "SOLID", color }];
+    line2.cornerRadius = strokeWidth / 2;
     safeAppend(container, line2);
   } else if (iconType.includes("check")) {
-    // Check mark: two lines forming a check
-    const line1 = figma.createLine();
-    line1.resize(size * 0.3, 0);
-    line1.x = size * 0.25;
-    line1.y = size * 0.5;
-    line1.rotation = -Math.PI / 4;
-    line1.strokes = [{ type: "SOLID", color }];
-    line1.strokeWeight = strokeWidth;
-    line1.strokeCap = "ROUND";
+    // Check mark using rectangles
+    const line1 = figma.createRectangle();
+    line1.resize(innerSize * 0.3, strokeWidth);
+    line1.x = padding + innerSize * 0.1;
+    line1.y = size / 2 + innerSize * 0.1;
+    line1.rotation = 45;
+    line1.fills = [{ type: "SOLID", color }];
+    line1.cornerRadius = strokeWidth / 2;
     safeAppend(container, line1);
     
-    const line2 = figma.createLine();
-    line2.resize(size * 0.5, 0);
-    line2.x = size * 0.4;
-    line2.y = size * 0.65;
-    line2.rotation = Math.PI / 4;
-    line2.strokes = [{ type: "SOLID", color }];
-    line2.strokeWeight = strokeWidth;
-    line2.strokeCap = "ROUND";
+    const line2 = figma.createRectangle();
+    line2.resize(innerSize * 0.55, strokeWidth);
+    line2.x = padding + innerSize * 0.25;
+    line2.y = size / 2 + innerSize * 0.25;
+    line2.rotation = -45;
+    line2.fills = [{ type: "SOLID", color }];
+    line2.cornerRadius = strokeWidth / 2;
     safeAppend(container, line2);
   } else if (iconType.includes("search")) {
-    // Search: circle with line
+    // Search: circle with handle
     const circle = figma.createEllipse();
-    circle.resize(size * 0.6, size * 0.6);
-    circle.x = size * 0.15;
-    circle.y = size * 0.15;
+    circle.resize(innerSize * 0.6, innerSize * 0.6);
+    circle.x = padding;
+    circle.y = padding;
     circle.strokes = [{ type: "SOLID", color }];
     circle.strokeWeight = strokeWidth;
     circle.fills = [];
     safeAppend(container, circle);
     
-    const line = figma.createLine();
-    line.resize(size * 0.3, 0);
-    line.x = size * 0.6;
-    line.y = size * 0.6;
-    line.rotation = Math.PI / 4;
-    line.strokes = [{ type: "SOLID", color }];
-    line.strokeWeight = strokeWidth;
-    line.strokeCap = "ROUND";
-    safeAppend(container, line);
+    const handle = figma.createRectangle();
+    handle.resize(innerSize * 0.35, strokeWidth);
+    handle.x = padding + innerSize * 0.5;
+    handle.y = padding + innerSize * 0.5;
+    handle.rotation = 45;
+    handle.fills = [{ type: "SOLID", color }];
+    handle.cornerRadius = strokeWidth / 2;
+    safeAppend(container, handle);
   } else if (iconType.includes("menu")) {
-    // Menu: three horizontal lines
+    // Menu: three horizontal rectangles
     for (let i = 0; i < 3; i++) {
-      const line = figma.createLine();
-      line.resize(size * 0.7, 0);
-      line.x = size * 0.15;
-      line.y = size * (0.25 + i * 0.25);
-      line.strokes = [{ type: "SOLID", color }];
-      line.strokeWeight = strokeWidth;
-      safeAppend(container, line);
+      const rect = figma.createRectangle();
+      rect.resize(innerSize, strokeWidth);
+      rect.x = padding;
+      rect.y = padding + (innerSize * 0.25) + (i * innerSize * 0.25);
+      rect.fills = [{ type: "SOLID", color }];
+      rect.cornerRadius = strokeWidth / 2;
+      safeAppend(container, rect);
     }
   } else if (iconType.includes("user")) {
-    // User: circle with person shape
-    const circle = figma.createEllipse();
-    circle.resize(size * 0.5, size * 0.5);
-    circle.x = size * 0.25;
-    circle.y = size * 0.1;
-    circle.fills = [{ type: "SOLID", color }];
-    safeAppend(container, circle);
+    // User: head circle and body arc
+    const head = figma.createEllipse();
+    head.resize(innerSize * 0.4, innerSize * 0.4);
+    head.x = size / 2 - innerSize * 0.2;
+    head.y = padding;
+    head.fills = [{ type: "SOLID", color }];
+    safeAppend(container, head);
     
     const body = figma.createEllipse();
-    body.resize(size * 0.6, size * 0.7);
-    body.x = size * 0.2;
-    body.y = size * 0.45;
+    body.resize(innerSize * 0.7, innerSize * 0.5);
+    body.x = size / 2 - innerSize * 0.35;
+    body.y = padding + innerSize * 0.5;
     body.fills = [{ type: "SOLID", color }];
     safeAppend(container, body);
   } else if (iconType.includes("home")) {
-    // Home: house shape
+    // Home: roof triangle and base rectangle
     const roof = figma.createPolygon();
-    roof.resize(size * 0.7, size * 0.4);
-    roof.x = size * 0.15;
-    roof.y = size * 0.15;
+    roof.resize(innerSize * 0.9, innerSize * 0.45);
     roof.pointCount = 3;
-    roof.rotation = 180;
+    roof.x = padding + innerSize * 0.05;
+    roof.y = padding;
     roof.fills = [{ type: "SOLID", color }];
     safeAppend(container, roof);
     
     const base = figma.createRectangle();
-    base.resize(size * 0.6, size * 0.5);
-    base.x = size * 0.2;
-    base.y = size * 0.4;
+    base.resize(innerSize * 0.6, innerSize * 0.45);
+    base.x = padding + innerSize * 0.2;
+    base.y = padding + innerSize * 0.4;
     base.fills = [{ type: "SOLID", color }];
     safeAppend(container, base);
-  } else if (iconType.includes("heart") || iconType.includes("star")) {
-    // Heart/Star: simple filled shape
-    const shape = figma.createEllipse();
-    shape.resize(size * 0.7, size * 0.7);
-    shape.x = size * 0.15;
-    shape.y = size * 0.15;
-    shape.fills = [{ type: "SOLID", color }];
-    safeAppend(container, shape);
+    
+    // Door
+    const door = figma.createRectangle();
+    door.resize(innerSize * 0.2, innerSize * 0.3);
+    door.x = size / 2 - innerSize * 0.1;
+    door.y = size - padding - innerSize * 0.3;
+    door.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+    safeAppend(container, door);
+  } else if (iconType.includes("heart")) {
+    // Heart: two circles and a triangle
+    const leftCircle = figma.createEllipse();
+    leftCircle.resize(innerSize * 0.4, innerSize * 0.4);
+    leftCircle.x = padding + innerSize * 0.1;
+    leftCircle.y = padding + innerSize * 0.15;
+    leftCircle.fills = [{ type: "SOLID", color }];
+    safeAppend(container, leftCircle);
+    
+    const rightCircle = figma.createEllipse();
+    rightCircle.resize(innerSize * 0.4, innerSize * 0.4);
+    rightCircle.x = padding + innerSize * 0.5;
+    rightCircle.y = padding + innerSize * 0.15;
+    rightCircle.fills = [{ type: "SOLID", color }];
+    safeAppend(container, rightCircle);
+    
+    const bottom = figma.createPolygon();
+    bottom.resize(innerSize * 0.8, innerSize * 0.5);
+    bottom.pointCount = 3;
+    bottom.rotation = 180;
+    bottom.x = padding + innerSize * 0.1;
+    bottom.y = padding + innerSize * 0.7;
+    bottom.fills = [{ type: "SOLID", color }];
+    safeAppend(container, bottom);
+  } else if (iconType.includes("star")) {
+    // Star: 5-pointed star
+    const star = figma.createPolygon();
+    star.resize(innerSize, innerSize);
+    star.pointCount = 5;
+    star.x = padding;
+    star.y = padding;
+    star.fills = [{ type: "SOLID", color }];
+    safeAppend(container, star);
+  } else if (iconType.includes("calendar")) {
+    // Calendar: rectangle with top bar
+    const body = figma.createRectangle();
+    body.resize(innerSize, innerSize * 0.8);
+    body.x = padding;
+    body.y = padding + innerSize * 0.2;
+    body.cornerRadius = strokeWidth;
+    body.strokes = [{ type: "SOLID", color }];
+    body.strokeWeight = strokeWidth;
+    body.fills = [];
+    safeAppend(container, body);
+    
+    const top = figma.createRectangle();
+    top.resize(innerSize, innerSize * 0.25);
+    top.x = padding;
+    top.y = padding + innerSize * 0.2;
+    top.cornerRadius = strokeWidth;
+    top.fills = [{ type: "SOLID", color }];
+    safeAppend(container, top);
+  } else if (iconType.includes("settings") || iconType.includes("gear")) {
+    // Settings: circle with cog
+    const circle = figma.createEllipse();
+    circle.resize(innerSize * 0.5, innerSize * 0.5);
+    circle.x = size / 2 - innerSize * 0.25;
+    circle.y = size / 2 - innerSize * 0.25;
+    circle.strokes = [{ type: "SOLID", color }];
+    circle.strokeWeight = strokeWidth;
+    circle.fills = [];
+    safeAppend(container, circle);
+    
+    // Gear teeth (4 rectangles)
+    for (let i = 0; i < 4; i++) {
+      const tooth = figma.createRectangle();
+      tooth.resize(innerSize * 0.15, strokeWidth * 2);
+      tooth.x = size / 2 - innerSize * 0.075;
+      tooth.y = padding;
+      tooth.rotation = i * 45;
+      tooth.fills = [{ type: "SOLID", color }];
+      safeAppend(container, tooth);
+    }
+  } else if (iconType.includes("mail") || iconType.includes("email")) {
+    // Mail: envelope
+    const envelope = figma.createRectangle();
+    envelope.resize(innerSize, innerSize * 0.7);
+    envelope.x = padding;
+    envelope.y = padding + innerSize * 0.15;
+    envelope.cornerRadius = strokeWidth;
+    envelope.strokes = [{ type: "SOLID", color }];
+    envelope.strokeWeight = strokeWidth;
+    envelope.fills = [];
+    safeAppend(container, envelope);
+    
+    // V line for envelope
+    const v1 = figma.createRectangle();
+    v1.resize(innerSize * 0.55, strokeWidth);
+    v1.x = padding;
+    v1.y = padding + innerSize * 0.15;
+    v1.rotation = 30;
+    v1.fills = [{ type: "SOLID", color }];
+    safeAppend(container, v1);
+    
+    const v2 = figma.createRectangle();
+    v2.resize(innerSize * 0.55, strokeWidth);
+    v2.x = size - padding;
+    v2.y = padding + innerSize * 0.15;
+    v2.rotation = -30;
+    v2.fills = [{ type: "SOLID", color }];
+    safeAppend(container, v2);
+  } else if (iconType.includes("notification") || iconType.includes("bell")) {
+    // Bell shape
+    const bell = figma.createEllipse();
+    bell.resize(innerSize * 0.7, innerSize * 0.6);
+    bell.x = size / 2 - innerSize * 0.35;
+    bell.y = padding;
+    bell.fills = [{ type: "SOLID", color }];
+    safeAppend(container, bell);
+    
+    const base = figma.createRectangle();
+    base.resize(innerSize * 0.9, innerSize * 0.2);
+    base.x = padding + innerSize * 0.05;
+    base.y = padding + innerSize * 0.5;
+    base.cornerRadius = strokeWidth;
+    base.fills = [{ type: "SOLID", color }];
+    safeAppend(container, base);
+    
+    // Little ball at bottom
+    const ball = figma.createEllipse();
+    ball.resize(innerSize * 0.25, innerSize * 0.2);
+    ball.x = size / 2 - innerSize * 0.125;
+    ball.y = size - padding - innerSize * 0.2;
+    ball.fills = [{ type: "SOLID", color }];
+    safeAppend(container, ball);
+  } else if (iconType.includes("download")) {
+    // Download arrow
+    const arrow = figma.createRectangle();
+    arrow.resize(strokeWidth * 2, innerSize * 0.5);
+    arrow.x = size / 2 - strokeWidth;
+    arrow.y = padding;
+    arrow.fills = [{ type: "SOLID", color }];
+    safeAppend(container, arrow);
+    
+    const arrowHead = figma.createPolygon();
+    arrowHead.resize(innerSize * 0.4, innerSize * 0.3);
+    arrowHead.pointCount = 3;
+    arrowHead.rotation = 180;
+    arrowHead.x = size / 2 - innerSize * 0.2;
+    arrowHead.y = padding + innerSize * 0.7;
+    arrowHead.fills = [{ type: "SOLID", color }];
+    safeAppend(container, arrowHead);
+    
+    const baseline = figma.createRectangle();
+    baseline.resize(innerSize * 0.8, strokeWidth);
+    baseline.x = padding + innerSize * 0.1;
+    baseline.y = size - padding - strokeWidth;
+    baseline.fills = [{ type: "SOLID", color }];
+    safeAppend(container, baseline);
+  } else if (iconType.includes("upload")) {
+    // Upload arrow
+    const arrow = figma.createRectangle();
+    arrow.resize(strokeWidth * 2, innerSize * 0.5);
+    arrow.x = size / 2 - strokeWidth;
+    arrow.y = padding + innerSize * 0.3;
+    arrow.fills = [{ type: "SOLID", color }];
+    safeAppend(container, arrow);
+    
+    const arrowHead = figma.createPolygon();
+    arrowHead.resize(innerSize * 0.4, innerSize * 0.3);
+    arrowHead.pointCount = 3;
+    arrowHead.x = size / 2 - innerSize * 0.2;
+    arrowHead.y = padding;
+    arrowHead.fills = [{ type: "SOLID", color }];
+    safeAppend(container, arrowHead);
+    
+    const baseline = figma.createRectangle();
+    baseline.resize(innerSize * 0.8, strokeWidth);
+    baseline.x = padding + innerSize * 0.1;
+    baseline.y = size - padding - strokeWidth;
+    baseline.fills = [{ type: "SOLID", color }];
+    safeAppend(container, baseline);
+  } else if (iconType.includes("edit") || iconType.includes("pencil")) {
+    // Pencil shape
+    const body = figma.createRectangle();
+    body.resize(innerSize * 0.6, strokeWidth * 3);
+    body.x = padding + innerSize * 0.1;
+    body.y = size / 2 - strokeWidth * 1.5;
+    body.rotation = 45;
+    body.fills = [{ type: "SOLID", color }];
+    safeAppend(container, body);
+    
+    const tip = figma.createPolygon();
+    tip.resize(innerSize * 0.2, innerSize * 0.15);
+    tip.pointCount = 3;
+    tip.rotation = -135;
+    tip.x = size - padding - innerSize * 0.15;
+    tip.y = size - padding - innerSize * 0.35;
+    tip.fills = [{ type: "SOLID", color }];
+    safeAppend(container, tip);
+  } else if (iconType.includes("share")) {
+    // Share icon: three circles connected
+    const circles = [
+      { x: size / 2 - innerSize * 0.15, y: padding },
+      { x: padding, y: size / 2 - innerSize * 0.15 },
+      { x: size / 2 - innerSize * 0.15, y: size - padding - innerSize * 0.3 }
+    ];
+    
+    circles.forEach((pos, i) => {
+      const circle = figma.createEllipse();
+      circle.resize(innerSize * 0.3, innerSize * 0.3);
+      circle.x = pos.x;
+      circle.y = pos.y;
+      circle.fills = [{ type: "SOLID", color }];
+      safeAppend(container, circle);
+    });
+  } else if (iconType.includes("filter")) {
+    // Filter funnel
+    const top = figma.createRectangle();
+    top.resize(innerSize, strokeWidth);
+    top.x = padding;
+    top.y = padding;
+    top.fills = [{ type: "SOLID", color }];
+    safeAppend(container, top);
+    
+    const middle = figma.createRectangle();
+    middle.resize(innerSize * 0.7, strokeWidth);
+    middle.x = padding + innerSize * 0.15;
+    middle.y = padding + innerSize * 0.35;
+    middle.fills = [{ type: "SOLID", color }];
+    safeAppend(container, middle);
+    
+    const bottom = figma.createRectangle();
+    bottom.resize(innerSize * 0.4, strokeWidth);
+    bottom.x = padding + innerSize * 0.3;
+    bottom.y = padding + innerSize * 0.7;
+    bottom.fills = [{ type: "SOLID", color }];
+    safeAppend(container, bottom);
+  } else if (iconType.includes("plus") || iconType.includes("add")) {
+    // Plus sign
+    const horizontal = figma.createRectangle();
+    horizontal.resize(innerSize * 0.7, strokeWidth * 1.5);
+    horizontal.x = padding + innerSize * 0.15;
+    horizontal.y = size / 2 - strokeWidth * 0.75;
+    horizontal.fills = [{ type: "SOLID", color }];
+    horizontal.cornerRadius = strokeWidth / 2;
+    safeAppend(container, horizontal);
+    
+    const vertical = figma.createRectangle();
+    vertical.resize(strokeWidth * 1.5, innerSize * 0.7);
+    vertical.x = size / 2 - strokeWidth * 0.75;
+    vertical.y = padding + innerSize * 0.15;
+    vertical.fills = [{ type: "SOLID", color }];
+    vertical.cornerRadius = strokeWidth / 2;
+    safeAppend(container, vertical);
+  } else if (iconType.includes("minus")) {
+    // Minus sign
+    const horizontal = figma.createRectangle();
+    horizontal.resize(innerSize * 0.7, strokeWidth * 1.5);
+    horizontal.x = padding + innerSize * 0.15;
+    horizontal.y = size / 2 - strokeWidth * 0.75;
+    horizontal.fills = [{ type: "SOLID", color }];
+    horizontal.cornerRadius = strokeWidth / 2;
+    safeAppend(container, horizontal);
   } else {
     // Default: simple circle
     const circle = figma.createEllipse();
-    circle.resize(size * 0.7, size * 0.7);
-    circle.x = size * 0.15;
-    circle.y = size * 0.15;
+    circle.resize(innerSize * 0.7, innerSize * 0.7);
+    circle.x = size / 2 - innerSize * 0.35;
+    circle.y = size / 2 - innerSize * 0.35;
     circle.fills = [{ type: "SOLID", color }];
     safeAppend(container, circle);
   }
@@ -448,6 +781,7 @@ function getSectionForComponent(component: string): string {
     tooltip: "Feedback",
     card: "Layout",
     modal: "Layout",
+    "alert-dialog": "Layout",
     divider: "Layout",
     dropdown: "Layout",
     faq: "Content",
@@ -493,16 +827,17 @@ async function createButtonVariant(config: {
   size: "Small" | "Medium" | "Large";
   state: "Default" | "Hover" | "Disabled" | "Loading";
   shape: "Default" | "Capsule";
-  icon: string; // RemixIcon name or "None"
+  icon: string;
   lang: "ar" | "en";
 }): Promise<ComponentNode> {
   const { type, size, state, shape, icon, lang } = config;
   const sizeConfig = SIZES[size];
+  const colors = getColors();
   const isCapsule = shape === "Capsule";
-  const radius = isCapsule ? 999 : 12;
 
+  // Create component
   const component = figma.createComponent();
-    component.name = buildComponentName("Button", {
+  component.name = buildComponentName("Button", {
     type,
     size,
     state,
@@ -511,73 +846,138 @@ async function createButtonVariant(config: {
     lang,
   });
 
+  // Auto Layout setup
   component.layoutMode = "HORIZONTAL";
   component.primaryAxisSizingMode = "AUTO";
-  component.counterAxisSizingMode = "FIXED";
+  component.counterAxisSizingMode = "AUTO";
   component.primaryAxisAlignItems = "CENTER";
   component.counterAxisAlignItems = "CENTER";
   component.paddingLeft = sizeConfig.padding;
   component.paddingRight = sizeConfig.padding;
-  component.paddingTop = sizeConfig.padding;
-  component.paddingBottom = sizeConfig.padding;
-  component.resize(100, sizeConfig.height);
-  component.cornerRadius = radius;
+  component.paddingTop = 0;
+  component.paddingBottom = 0;
+  component.itemSpacing = sizeConfig.gap;
+  component.cornerRadius = isCapsule ? DESIGN_TOKENS.radius.full : DESIGN_TOKENS.radius.md;
+  component.minHeight = sizeConfig.height;
 
-  // Colors - use getColors() to get latest theme colors
-  const colors = getColors();
-  let fillColor = colors.primary;
-  let textColor = colors.white;
-  let strokeColor: SolidPaint | undefined;
+  // Color scheme based on type
+  let bgColor: RGB;
+  let textColor: RGB;
+  let borderColor: RGB | null = null;
 
-  if (type === "Secondary") {
-    fillColor = colors.white;
-    textColor = colors.primary;
-    strokeColor = { type: "SOLID", color: colors.primary };
-  } else if (type === "Ghost") {
-    fillColor = colors.white;
-    textColor = colors.primary;
-  } else if (type === "Danger") {
-    fillColor = colors.danger;
-    textColor = colors.white;
+  switch (type) {
+    case "Primary":
+      bgColor = colors.primary;
+      textColor = colors.white;
+      break;
+    case "Secondary":
+      bgColor = colors.white;
+      textColor = colors.text;
+      borderColor = colors.border;
+      break;
+    case "Ghost":
+      bgColor = { r: 0, g: 0, b: 0 };
+      textColor = colors.text;
+      break;
+    case "Danger":
+      bgColor = colors.danger;
+      textColor = colors.white;
+      break;
+    default:
+      bgColor = colors.primary;
+      textColor = colors.white;
   }
 
-  if (state === "Hover" && type !== "Ghost") {
-    fillColor = {
-      r: Math.max(0, fillColor.r - 0.1),
-      g: Math.max(0, fillColor.g - 0.1),
-      b: Math.max(0, fillColor.b - 0.1),
-    };
-  } else if (state === "Hover" && type === "Ghost") {
-    fillColor = { r: 0.95, g: 0.95, b: 0.95 };
+  // State modifications
+  if (state === "Hover") {
+    if (type === "Ghost") {
+      bgColor = { r: 0.97, g: 0.97, b: 0.97 };
+    } else if (type === "Secondary") {
+      bgColor = { r: 0.98, g: 0.98, b: 0.98 };
+    } else {
+      bgColor = {
+        r: Math.max(0, bgColor.r * 0.92),
+        g: Math.max(0, bgColor.g * 0.92),
+        b: Math.max(0, bgColor.b * 0.92),
+      };
+    }
   }
 
-  component.fills = [{ type: "SOLID", color: fillColor }];
-  if (strokeColor) {
-    component.strokes = [strokeColor];
+  // Apply fills
+  if (type === "Ghost" && state === "Default") {
+    component.fills = [];
+  } else {
+    component.fills = [{ type: "SOLID", color: bgColor }];
+  }
+
+  // Apply border
+  if (borderColor) {
+    component.strokes = [{ type: "SOLID", color: borderColor }];
     component.strokeWeight = 1;
   }
-  component.opacity = state === "Disabled" ? 0.5 : 1;
 
-  // Text
-  let text = lang === "ar" ? "زر" : "Button";
-  if (type === "Danger") {
-    text = lang === "ar" ? "تسجيل الخروج" : "Logout";
-  }
-  if (state === "Loading") {
-    text = lang === "ar" ? "جاري التحميل" : "Loading";
+  // Disabled state
+  if (state === "Disabled") {
+    component.opacity = 0.5;
   }
 
-  const textNode = await createTextNode(text, sizeConfig.fontSize, lang);
+  // Load font
+  const font = lang === "ar"
+    ? await ensureFont("Cairo", "SemiBold")
+    : await ensureFont("Inter", "Medium");
+
+  // Button labels
+  const labels: Record<string, { en: string; ar: string }> = {
+    Primary: { en: "Button", ar: "زر" },
+    Secondary: { en: "Button", ar: "زر" },
+    Ghost: { en: "Button", ar: "زر" },
+    Danger: { en: "Delete", ar: "حذف" },
+  };
+
+  // Create text node
+  const textNode = figma.createText();
+  textNode.fontName = font;
+  textNode.fontSize = sizeConfig.fontSize;
+  textNode.lineHeight = { value: sizeConfig.height, unit: "PIXELS" };
   textNode.fills = [{ type: "SOLID", color: textColor }];
 
-  // Icon from RemixIcon
-  if (icon !== "None") {
+  const hasIcon = icon && icon !== "None";
+  const isLoading = state === "Loading";
+
+  if (isLoading) {
+    // Loading spinner
+    const spinnerSize = sizeConfig.iconSize - 2;
+    const spinner = figma.createFrame();
+    spinner.name = "Spinner";
+    spinner.resize(spinnerSize, spinnerSize);
+    spinner.fills = [];
+    
+    const arc = figma.createEllipse();
+    arc.resize(spinnerSize, spinnerSize);
+    arc.fills = [];
+    arc.strokes = [{ type: "SOLID", color: textColor }];
+    arc.strokeWeight = 2;
+    arc.arcData = { startingAngle: 0, endingAngle: 4.5, innerRadius: 0.7 };
+    safeAppend(spinner, arc);
+    
+    textNode.characters = lang === "ar" ? "جاري..." : "Loading...";
+    
+    if (lang === "ar") {
+      safeAppend(component, textNode);
+      safeAppend(component, spinner);
+    } else {
+      safeAppend(component, spinner);
+      safeAppend(component, textNode);
+    }
+  } else if (hasIcon) {
+    textNode.characters = labels[type][lang];
     const iconNode = createIcon(icon, sizeConfig.iconSize, textColor);
+    const isTrailingIcon = icon.includes("arrow-right") || icon.includes("chevron-right");
     
-    // Determine icon position based on icon name or default to left
-    const isRightIcon = icon.includes("arrow-right") || icon.includes("chevron-right");
-    
-    if (isRightIcon) {
+    if (isTrailingIcon) {
+      safeAppend(component, textNode);
+      safeAppend(component, iconNode);
+    } else if (lang === "ar") {
       safeAppend(component, textNode);
       safeAppend(component, iconNode);
     } else {
@@ -585,41 +985,8 @@ async function createButtonVariant(config: {
       safeAppend(component, textNode);
     }
   } else {
+    textNode.characters = labels[type][lang];
     safeAppend(component, textNode);
-  }
-
-  // Loading spinner placeholder
-  if (state === "Loading") {
-    const spinner = figma.createEllipse();
-    spinner.resize(sizeConfig.iconSize, sizeConfig.iconSize);
-    spinner.strokes = [{ type: "SOLID", color: textColor }];
-    spinner.strokeWeight = 2;
-    spinner.fills = [];
-    
-    // Remove existing icon if present
-    if (icon !== "None") {
-      const iconIndex = component.children.findIndex(
-        (child) => child.type === "VECTOR"
-      );
-      if (iconIndex !== -1) {
-        component.children[iconIndex].remove();
-      }
-    } else {
-      // Remove text if no icon
-      if (component.children.length > 0) {
-        component.children[0].remove();
-      }
-    }
-    
-    // Add spinner and text
-    const isRightIcon = icon.includes("arrow-right") || icon.includes("chevron-right");
-    if (isRightIcon) {
-      safeAppend(component, textNode);
-      safeAppend(component, spinner);
-    } else {
-      safeAppend(component, spinner);
-      safeAppend(component, textNode);
-    }
   }
 
   return component;
@@ -653,44 +1020,67 @@ async function createIconButtonVariant(config: {
 }): Promise<ComponentNode> {
   const { type, size, state } = config;
   const sizeConfig = SIZES[size];
+  const colors = getColors();
 
   const component = figma.createComponent();
   component.name = buildComponentName("Icon Button", { type, size, state });
 
+  // Layout - square button
   component.layoutMode = "HORIZONTAL";
   component.primaryAxisAlignItems = "CENTER";
   component.counterAxisAlignItems = "CENTER";
   component.resize(sizeConfig.height, sizeConfig.height);
-  component.cornerRadius = 12;
+  component.cornerRadius = 8;
 
-  let fillColor = getColors().primary;
-  let iconColor = getColors().white;
+  let fillColor = colors.primary;
+  let iconColor = colors.white;
+  let strokeColor: RGB | undefined;
 
   if (type === "Secondary") {
-    fillColor = getColors().white;
-    iconColor = getColors().primary;
+    fillColor = colors.white;
+    iconColor = colors.text;
+    strokeColor = colors.border;
   } else if (type === "Ghost") {
-    fillColor = getColors().white;
-    iconColor = getColors().primary;
+    fillColor = { r: 0, g: 0, b: 0 };
+    iconColor = colors.text;
   } else if (type === "Danger") {
-    fillColor = getColors().danger;
-    iconColor = getColors().white;
+    fillColor = colors.danger;
+    iconColor = colors.white;
   }
 
+  // Hover state
   if (state === "Hover") {
-    fillColor = {
-      r: Math.max(0, fillColor.r - 0.1),
-      g: Math.max(0, fillColor.g - 0.1),
-      b: Math.max(0, fillColor.b - 0.1),
-    };
+    if (type === "Ghost") {
+      fillColor = { r: 0.96, g: 0.96, b: 0.96 };
+    } else if (type === "Secondary") {
+      fillColor = { r: 0.98, g: 0.98, b: 0.98 };
+    } else {
+      fillColor = {
+        r: Math.max(0, fillColor.r * 0.9),
+        g: Math.max(0, fillColor.g * 0.9),
+        b: Math.max(0, fillColor.b * 0.9),
+      };
+    }
   }
 
-  component.fills = [{ type: "SOLID", color: fillColor }];
+  // Apply styles
+  if (type === "Ghost" && state === "Default") {
+    component.fills = [];
+  } else {
+    component.fills = [{ type: "SOLID", color: fillColor }];
+  }
+  
+  if (strokeColor) {
+    component.strokes = [{ type: "SOLID", color: strokeColor }];
+    component.strokeWeight = 1;
+  }
+  
   component.opacity = state === "Disabled" ? 0.5 : 1;
 
-  // Icon from RemixIcon (menu icon)
-  const iconNode = createIcon("ri-menu-line", sizeConfig.iconSize, iconColor);
+  // Plus icon for icon button
+  const iconNode = createIcon("ri-plus-line", sizeConfig.iconSize, iconColor);
   safeAppend(component, iconNode);
+  
   return component;
 }
 
@@ -928,62 +1318,84 @@ async function createTextInputVariant(config: {
 }): Promise<ComponentNode> {
   const { state, size, lang } = config;
   const sizeConfig = SIZES[size];
+  const colors = getColors();
+  
   const component = figma.createComponent();
   component.name = buildComponentName("Text Input", { state, size, lang });
 
+  // Main container
   component.layoutMode = "VERTICAL";
-  component.resize(300, sizeConfig.height + 40);
-  component.itemSpacing = 8;
-  component.paddingTop = 0;
-  component.paddingBottom = 0;
-  component.paddingLeft = 0;
-  component.paddingRight = 0;
+  component.primaryAxisSizingMode = "AUTO";
+  component.counterAxisSizingMode = "FIXED";
+  component.resize(280, 1);
+  component.itemSpacing = 6;
 
-  const label = await createTextNode(
-    lang === "ar" ? "عنوان" : "Label",
-    12,
-    lang
-  );
-  label.fills = [{ type: "SOLID", color: getColors().text }];
+  // Label
+  const labelFont = lang === "ar" 
+    ? await ensureFont("Cairo", "Medium")
+    : await ensureFont("Inter", "Medium");
+  
+  const label = figma.createText();
+  label.fontName = labelFont;
+  label.characters = lang === "ar" ? "العنوان" : "Label";
+  label.fontSize = 13;
+  label.fills = [{ type: "SOLID", color: colors.text }];
+  label.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
   safeAppend(component, label);
 
+  // Input field
   const inputFrame = figma.createFrame();
-  inputFrame.resize(300, sizeConfig.height);
+  inputFrame.name = "Input";
   inputFrame.layoutMode = "HORIZONTAL";
+  inputFrame.primaryAxisSizingMode = "FIXED";
+  inputFrame.counterAxisSizingMode = "FIXED";
+  inputFrame.resize(280, sizeConfig.height);
   inputFrame.paddingLeft = 12;
   inputFrame.paddingRight = 12;
-  inputFrame.cornerRadius = 8;
-  inputFrame.fills = [{ type: "SOLID", color: getColors().white }];
-  inputFrame.strokes = [
-    {
-      type: "SOLID",
-      color:
-        state === "Error"
-          ? getColors().danger
-          : state === "Focus"
-          ? getColors().primary
-          : getColors().border,
-    },
-  ];
-  inputFrame.strokeWeight = state === "Focus" ? 2 : 1;
+  inputFrame.counterAxisAlignItems = "CENTER";
+  inputFrame.cornerRadius = 6;
+  inputFrame.fills = [{ type: "SOLID", color: colors.white }];
+  
+  // Border color based on state
+  let borderColor = colors.border;
+  let borderWidth = 1;
+  if (state === "Focus") {
+    borderColor = colors.primary;
+    borderWidth = 2;
+  } else if (state === "Error") {
+    borderColor = colors.danger;
+  }
+  
+  inputFrame.strokes = [{ type: "SOLID", color: borderColor }];
+  inputFrame.strokeWeight = borderWidth;
   inputFrame.opacity = state === "Disabled" ? 0.5 : 1;
 
-  const placeholder = await createTextNode(
-    lang === "ar" ? "اكتب هنا" : "Type here",
-    sizeConfig.fontSize,
-    lang
-  );
-  placeholder.fills = [{ type: "SOLID", color: getColors().muted }];
+  // Placeholder text
+  const placeholderFont = await getFontForLanguage(lang);
+  const placeholder = figma.createText();
+  placeholder.fontName = placeholderFont;
+  placeholder.characters = lang === "ar" ? "اكتب هنا..." : "Enter text...";
+  placeholder.fontSize = sizeConfig.fontSize;
+  placeholder.fills = [{ type: "SOLID", color: colors.muted }];
+  placeholder.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  placeholder.layoutAlign = "STRETCH";
+  placeholder.layoutGrow = 1;
   safeAppend(inputFrame, placeholder);
+  
   safeAppend(component, inputFrame);
 
+  // Error message
   if (state === "Error") {
-    const errorText = await createTextNode(
-      lang === "ar" ? "مطلوب" : "Required",
-      12,
-      lang
-    );
-    errorText.fills = [{ type: "SOLID", color: getColors().danger }];
+    const errorFont = lang === "ar" 
+      ? await ensureFont("Cairo", "Regular")
+      : await ensureFont("Inter", "Regular");
+    
+    const errorText = figma.createText();
+    errorText.fontName = errorFont;
+    errorText.characters = lang === "ar" ? "هذا الحقل مطلوب" : "This field is required";
+    errorText.fontSize = 12;
+    errorText.fills = [{ type: "SOLID", color: colors.danger }];
+    errorText.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
     safeAppend(component, errorText);
   }
 
@@ -1099,42 +1511,47 @@ async function createCheckboxVariant(config: {
   lang: "ar" | "en";
 }): Promise<ComponentNode> {
   const { state, lang } = config;
+  const colors = getColors();
+  
   const component = figma.createComponent();
   component.name = buildComponentName("Checkbox", { state, lang });
 
   component.layoutMode = "HORIZONTAL";
-  component.resize(120, 20);
-  component.itemSpacing = 8;
-  component.primaryAxisAlignItems = lang === "ar" ? "MAX" : "MIN";
+  component.primaryAxisSizingMode = "AUTO";
+  component.counterAxisSizingMode = "AUTO";
+  component.itemSpacing = 10;
+  component.counterAxisAlignItems = "CENTER";
 
+  // Checkbox box
   const checkbox = figma.createFrame();
-  checkbox.resize(20, 20);
+  checkbox.name = "Checkbox";
+  checkbox.resize(18, 18);
   checkbox.cornerRadius = 4;
-  checkbox.fills = [{ type: "SOLID", color: getColors().white }];
-  checkbox.strokes = [{ type: "SOLID", color: getColors().border }];
-  checkbox.strokeWeight = 1;
+  
+  if (state === "Checked") {
+    checkbox.fills = [{ type: "SOLID", color: colors.primary }];
+    checkbox.strokes = [{ type: "SOLID", color: colors.primary }];
+    
+    // Checkmark using simple shapes
+    const checkIcon = createIcon("ri-check-line", 14, colors.white);
+    checkIcon.x = 2;
+    checkIcon.y = 2;
+    safeAppend(checkbox, checkIcon);
+  } else {
+    checkbox.fills = [{ type: "SOLID", color: colors.white }];
+    checkbox.strokes = [{ type: "SOLID", color: colors.border }];
+  }
+  
+  checkbox.strokeWeight = 1.5;
   checkbox.opacity = state === "Disabled" ? 0.5 : 1;
 
-  if (state === "Checked") {
-    const check = figma.createVector();
-    check.vectorPaths = [
-      {
-        windingRule: "NONZERO",
-        data: "M 4 10 L 8 14 L 16 6",
-      },
-    ];
-    check.strokes = [{ type: "SOLID", color: getColors().primary }];
-    check.strokeWeight = 2;
-    check.resize(20, 20);
-    safeAppend(checkbox, check);
-  }
-
-  const label = await createTextNode(
-    lang === "ar" ? "خيار" : "Option",
-    14,
-    lang
-  );
-  label.fills = [{ type: "SOLID", color: getColors().text }];
+  // Label
+  const labelFont = await getFontForLanguage(lang);
+  const label = figma.createText();
+  label.fontName = labelFont;
+  label.characters = lang === "ar" ? "خيار التحديد" : "Checkbox option";
+  label.fontSize = 14;
+  label.fills = [{ type: "SOLID", color: colors.text }];
   label.opacity = state === "Disabled" ? 0.5 : 1;
 
   if (lang === "ar") {
@@ -1409,49 +1826,148 @@ async function createCardVariant(config: {
   lang: "ar" | "en";
 }): Promise<ComponentNode> {
   const { type, lang } = config;
+  const colors = getColors();
+  
   const component = figma.createComponent();
   component.name = buildComponentName("Card", { type, lang });
 
+  // Main card container
   component.layoutMode = "VERTICAL";
-  component.resize(300, 200);
-  component.paddingTop = 24;
-  component.paddingBottom = 24;
-  component.paddingLeft = 24;
-  component.paddingRight = 24;
-  component.itemSpacing = 12;
-  component.cornerRadius = 12;
-  component.fills = [{ type: "SOLID", color: getColors().white }];
-  component.strokes = [{ type: "SOLID", color: getColors().border }];
-  component.strokeWeight = 1;
+  component.primaryAxisSizingMode = "AUTO";
+  component.counterAxisSizingMode = "FIXED";
+  component.resize(320, 1);
+  component.paddingTop = 20;
+  component.paddingBottom = 20;
+  component.paddingLeft = 20;
+  component.paddingRight = 20;
+  component.itemSpacing = 16;
+  component.cornerRadius = DESIGN_TOKENS.radius.xl;
+  component.fills = [{ type: "SOLID", color: colors.white }];
 
-  if (type === "Elevated") {
+  if (type === "Default") {
+    component.strokes = [{ type: "SOLID", color: colors.border }];
+    component.strokeWeight = 1;
+  } else {
+    // Elevated card with shadow
     component.effects = [
       {
         type: "DROP_SHADOW",
+        color: { r: 0, g: 0, b: 0, a: 0.04 },
+        offset: { x: 0, y: 1 },
+        radius: 3,
+        spread: 0,
+        visible: true,
+        blendMode: "NORMAL",
+      },
+      {
+        type: "DROP_SHADOW",
         color: { r: 0, g: 0, b: 0, a: 0.1 },
-        offset: { x: 0, y: 4 },
-        radius: 8,
+        offset: { x: 0, y: 10 },
+        radius: 15,
+        spread: -3,
         visible: true,
         blendMode: "NORMAL",
       },
     ];
   }
 
-  const title = await createTextNode(
-    lang === "ar" ? "عنوان" : "Title",
-    18,
-    lang
-  );
-  title.fills = [{ type: "SOLID", color: getColors().text }];
-  safeAppend(component, title);
+  // Header section
+  const header = figma.createFrame();
+  header.name = "Header";
+  header.layoutMode = "VERTICAL";
+  header.primaryAxisSizingMode = "AUTO";
+  header.counterAxisSizingMode = "AUTO";
+  header.layoutAlign = "STRETCH";
+  header.itemSpacing = 4;
+  header.fills = [];
 
-  const body = await createTextNode(
-    lang === "ar" ? "نص المحتوى" : "Body text",
-    14,
-    lang
-  );
-  body.fills = [{ type: "SOLID", color: getColors().muted }];
-  safeAppend(component, body);
+  // Title
+  const titleFont = lang === "ar"
+    ? await ensureFont("Cairo", "SemiBold")
+    : await ensureFont("Inter", "SemiBold");
+  
+  const title = figma.createText();
+  title.fontName = titleFont;
+  title.characters = lang === "ar" ? "عنوان البطاقة" : "Card Title";
+  title.fontSize = 16;
+  title.fills = [{ type: "SOLID", color: colors.text }];
+  title.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  safeAppend(header, title);
+
+  // Subtitle
+  const subtitleFont = await getFontForLanguage(lang);
+  const subtitle = figma.createText();
+  subtitle.fontName = subtitleFont;
+  subtitle.characters = lang === "ar" ? "وصف مختصر للبطاقة" : "A brief description of the card";
+  subtitle.fontSize = 14;
+  subtitle.fills = [{ type: "SOLID", color: colors.muted }];
+  subtitle.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  safeAppend(header, subtitle);
+
+  safeAppend(component, header);
+
+  // Content area
+  const content = figma.createFrame();
+  content.name = "Content";
+  content.layoutMode = "VERTICAL";
+  content.primaryAxisSizingMode = "AUTO";
+  content.counterAxisSizingMode = "AUTO";
+  content.layoutAlign = "STRETCH";
+  content.fills = [];
+
+  const bodyFont = await getFontForLanguage(lang);
+  const bodyText = figma.createText();
+  bodyText.fontName = bodyFont;
+  bodyText.characters = lang === "ar" 
+    ? "هذا هو محتوى البطاقة. يمكنك إضافة أي محتوى تريده هنا."
+    : "This is the card content. You can add any content you want here.";
+  bodyText.fontSize = 14;
+  bodyText.lineHeight = { value: 20, unit: "PIXELS" };
+  bodyText.fills = [{ type: "SOLID", color: colors.text }];
+  bodyText.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  bodyText.layoutAlign = "STRETCH";
+  bodyText.textAutoResize = "HEIGHT";
+  safeAppend(content, bodyText);
+
+  safeAppend(component, content);
+
+  // Footer with button
+  const footer = figma.createFrame();
+  footer.name = "Footer";
+  footer.layoutMode = "HORIZONTAL";
+  footer.primaryAxisSizingMode = "AUTO";
+  footer.counterAxisSizingMode = "AUTO";
+  footer.layoutAlign = "STRETCH";
+  footer.primaryAxisAlignItems = lang === "ar" ? "MIN" : "MAX";
+  footer.fills = [];
+
+  const buttonFont = lang === "ar"
+    ? await ensureFont("Cairo", "Medium")
+    : await ensureFont("Inter", "Medium");
+
+  const button = figma.createFrame();
+  button.name = "Button";
+  button.layoutMode = "HORIZONTAL";
+  button.primaryAxisSizingMode = "AUTO";
+  button.counterAxisSizingMode = "AUTO";
+  button.primaryAxisAlignItems = "CENTER";
+  button.counterAxisAlignItems = "CENTER";
+  button.paddingLeft = 16;
+  button.paddingRight = 16;
+  button.paddingTop = 8;
+  button.paddingBottom = 8;
+  button.cornerRadius = DESIGN_TOKENS.radius.md;
+  button.fills = [{ type: "SOLID", color: colors.primary }];
+
+  const buttonText = figma.createText();
+  buttonText.fontName = buttonFont;
+  buttonText.characters = lang === "ar" ? "اقرأ المزيد" : "Read More";
+  buttonText.fontSize = 13;
+  buttonText.fills = [{ type: "SOLID", color: colors.white }];
+  safeAppend(button, buttonText);
+
+  safeAppend(footer, button);
+  safeAppend(component, footer);
 
   return component;
 }
@@ -1938,15 +2454,17 @@ async function createBreadcrumbs(lang: "ar" | "en"): Promise<ComponentNode> {
   component.resize(300, 24);
   component.itemSpacing = 8;
   component.primaryAxisAlignItems = "CENTER";
+  component.counterAxisAlignItems = "CENTER";
 
   const items = lang === "ar" ? ["الرئيسية", "الصفحة", "الحالية"] : ["Home", "Page", "Current"];
 
-  items.forEach((item, index) => {
+  // Load font first
+  const font = await getFontForLanguage(lang);
+
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index];
     const text = figma.createText();
-    text.fontName = { family: "Inter", style: "Regular" };
-    try {
-      figma.loadFontAsync({ family: "Inter", style: "Regular" });
-    } catch {}
+    text.fontName = font;
     text.characters = item;
     text.fontSize = 14;
     text.fills = [
@@ -1962,7 +2480,7 @@ async function createBreadcrumbs(lang: "ar" | "en"): Promise<ComponentNode> {
       const separator = createIcon(separatorIcon, 16, getColors().muted);
       safeAppend(component, separator);
     }
-  });
+  }
 
   return component;
 }
@@ -1975,28 +2493,33 @@ async function createPagination(lang: "ar" | "en"): Promise<ComponentNode> {
   component.resize(300, 40);
   component.itemSpacing = 4;
   component.primaryAxisAlignItems = "CENTER";
+  component.counterAxisAlignItems = "CENTER";
+
+  // Load font first
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
 
   const pages = ["1", "2", "3", "4", "5"];
-  pages.forEach((page, index) => {
+  for (let index = 0; index < pages.length; index++) {
+    const page = pages[index];
     const pageBtn = figma.createFrame();
     pageBtn.resize(32, 32);
     pageBtn.cornerRadius = 6;
+    pageBtn.layoutMode = "HORIZONTAL";
+    pageBtn.primaryAxisAlignItems = "CENTER";
+    pageBtn.counterAxisAlignItems = "CENTER";
     pageBtn.fills = [
       {
         type: "SOLID",
         color: index === 0 ? getColors().primary : getColors().white,
       },
     ];
-    if (index === 0) {
-      pageBtn.strokes = [{ type: "SOLID", color: getColors().primary }];
+    if (index !== 0) {
+      pageBtn.strokes = [{ type: "SOLID", color: getColors().border }];
       pageBtn.strokeWeight = 1;
     }
 
     const text = figma.createText();
     text.fontName = { family: "Inter", style: "Regular" };
-    try {
-      figma.loadFontAsync({ family: "Inter", style: "Regular" });
-    } catch {}
     text.characters = page;
     text.fontSize = 14;
     text.fills = [
@@ -2005,11 +2528,9 @@ async function createPagination(lang: "ar" | "en"): Promise<ComponentNode> {
         color: index === 0 ? getColors().white : getColors().text,
       },
     ];
-    text.x = 8;
-    text.y = 6;
     safeAppend(pageBtn, text);
     safeAppend(component, pageBtn);
-  });
+  }
 
   return component;
 }
@@ -2036,6 +2557,196 @@ async function createTooltip(lang: "ar" | "en"): Promise<ComponentNode> {
   safeAppend(component, text);
 
   return component;
+}
+
+async function createAlertDialogVariant(config: {
+  type: "Default" | "Danger";
+  lang: "ar" | "en";
+}): Promise<ComponentNode> {
+  const { type, lang } = config;
+  const component = figma.createComponent();
+  component.name = buildComponentName("Alert Dialog", { type, lang });
+
+  // Main container with fixed width
+  component.layoutMode = "VERTICAL";
+  component.primaryAxisSizingMode = "AUTO";
+  component.counterAxisSizingMode = "FIXED";
+  component.resize(420, 1);
+  component.paddingTop = 24;
+  component.paddingBottom = 24;
+  component.paddingLeft = 24;
+  component.paddingRight = 24;
+  component.itemSpacing = 20;
+  component.cornerRadius = 8;
+  component.fills = [{ type: "SOLID", color: getColors().white }];
+  component.strokes = [{ type: "SOLID", color: getColors().border }];
+  component.strokeWeight = 1;
+  component.effects = [
+    {
+      type: "DROP_SHADOW",
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 10 },
+      radius: 15,
+      visible: true,
+      blendMode: "NORMAL",
+    },
+    {
+      type: "DROP_SHADOW",
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 4 },
+      radius: 6,
+      visible: true,
+      blendMode: "NORMAL",
+    },
+  ];
+
+  // Content section - fills width
+  const contentFrame = figma.createFrame();
+  contentFrame.name = "Content";
+  contentFrame.layoutMode = "VERTICAL";
+  contentFrame.primaryAxisSizingMode = "AUTO";
+  contentFrame.counterAxisSizingMode = "AUTO";
+  contentFrame.layoutAlign = "STRETCH";
+  contentFrame.itemSpacing = 8;
+  contentFrame.fills = [];
+
+  // Title with semibold font
+  const titleText = lang === "ar" 
+    ? "هل أنت متأكد تماماً؟" 
+    : "Are you absolutely sure?";
+  
+  const title = figma.createText();
+  try {
+    const titleFont = lang === "ar" 
+      ? { family: "Cairo", style: "SemiBold" }
+      : { family: "Inter", style: "SemiBold" };
+    await figma.loadFontAsync(titleFont);
+    title.fontName = titleFont;
+  } catch {
+    await ensureFont("Inter", "Regular");
+    title.fontName = { family: "Inter", style: "Regular" };
+  }
+  title.characters = titleText;
+  title.fontSize = 16;
+  title.fills = [{ type: "SOLID", color: getColors().text }];
+  title.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  title.layoutAlign = "STRETCH";
+  safeAppend(contentFrame, title);
+
+  // Description with proper text wrap
+  const descText = lang === "ar"
+    ? "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف حسابك نهائياً وإزالة بياناتك من خوادمنا."
+    : "This action cannot be undone. This will permanently delete your account and remove your data from our servers.";
+  
+  const description = figma.createText();
+  const descFont = await getFontForLanguage(lang);
+  description.fontName = descFont;
+  description.characters = descText;
+  description.fontSize = 14;
+  description.lineHeight = { value: 20, unit: "PIXELS" };
+  description.fills = [{ type: "SOLID", color: getColors().muted }];
+  description.textAlignHorizontal = lang === "ar" ? "RIGHT" : "LEFT";
+  description.layoutAlign = "STRETCH";
+  description.textAutoResize = "HEIGHT";
+  safeAppend(contentFrame, description);
+
+  safeAppend(component, contentFrame);
+
+  // Buttons section - aligned to the right (or left for RTL)
+  const buttonsFrame = figma.createFrame();
+  buttonsFrame.name = "Buttons";
+  buttonsFrame.layoutMode = "HORIZONTAL";
+  buttonsFrame.primaryAxisSizingMode = "FIXED";
+  buttonsFrame.counterAxisSizingMode = "AUTO";
+  buttonsFrame.layoutAlign = "STRETCH";
+  buttonsFrame.itemSpacing = 8;
+  buttonsFrame.primaryAxisAlignItems = lang === "ar" ? "MIN" : "MAX";
+  buttonsFrame.counterAxisAlignItems = "CENTER";
+  buttonsFrame.fills = [];
+
+  // Cancel button - outline style
+  const cancelBtn = figma.createFrame();
+  cancelBtn.name = "Cancel";
+  cancelBtn.layoutMode = "HORIZONTAL";
+  cancelBtn.primaryAxisSizingMode = "AUTO";
+  cancelBtn.counterAxisSizingMode = "AUTO";
+  cancelBtn.primaryAxisAlignItems = "CENTER";
+  cancelBtn.counterAxisAlignItems = "CENTER";
+  cancelBtn.paddingLeft = 16;
+  cancelBtn.paddingRight = 16;
+  cancelBtn.paddingTop = 8;
+  cancelBtn.paddingBottom = 8;
+  cancelBtn.cornerRadius = 6;
+  cancelBtn.fills = [{ type: "SOLID", color: getColors().white }];
+  cancelBtn.strokes = [{ type: "SOLID", color: getColors().border }];
+  cancelBtn.strokeWeight = 1;
+
+  const cancelTextNode = figma.createText();
+  const cancelFont = lang === "ar" 
+    ? await ensureFont("Cairo", "Medium")
+    : await ensureFont("Inter", "Medium");
+  cancelTextNode.fontName = cancelFont;
+  cancelTextNode.characters = lang === "ar" ? "إلغاء" : "Cancel";
+  cancelTextNode.fontSize = 14;
+  cancelTextNode.fills = [{ type: "SOLID", color: getColors().text }];
+  safeAppend(cancelBtn, cancelTextNode);
+
+  // Continue/Confirm button - filled style
+  const confirmBtn = figma.createFrame();
+  confirmBtn.name = "Continue";
+  confirmBtn.layoutMode = "HORIZONTAL";
+  confirmBtn.primaryAxisSizingMode = "AUTO";
+  confirmBtn.counterAxisSizingMode = "AUTO";
+  confirmBtn.primaryAxisAlignItems = "CENTER";
+  confirmBtn.counterAxisAlignItems = "CENTER";
+  confirmBtn.paddingLeft = 16;
+  confirmBtn.paddingRight = 16;
+  confirmBtn.paddingTop = 8;
+  confirmBtn.paddingBottom = 8;
+  confirmBtn.cornerRadius = 6;
+  
+  const confirmColor = type === "Danger" ? getColors().danger : { r: 0.09, g: 0.09, b: 0.09 };
+  confirmBtn.fills = [{ type: "SOLID", color: confirmColor }];
+
+  const confirmTextNode = figma.createText();
+  const confirmFont = lang === "ar" 
+    ? await ensureFont("Cairo", "Medium")
+    : await ensureFont("Inter", "Medium");
+  confirmTextNode.fontName = confirmFont;
+  confirmTextNode.characters = lang === "ar" ? "متابعة" : "Continue";
+  confirmTextNode.fontSize = 14;
+  confirmTextNode.fills = [{ type: "SOLID", color: getColors().white }];
+  safeAppend(confirmBtn, confirmTextNode);
+
+  // Add buttons in correct order based on language
+  if (lang === "ar") {
+    safeAppend(buttonsFrame, confirmBtn);
+    safeAppend(buttonsFrame, cancelBtn);
+  } else {
+    safeAppend(buttonsFrame, cancelBtn);
+    safeAppend(buttonsFrame, confirmBtn);
+  }
+
+  safeAppend(component, buttonsFrame);
+
+  return component;
+}
+
+async function createAlertDialogComponentSet(
+  lang: "ar" | "en"
+): Promise<ComponentSetNode> {
+  const types: Array<"Default" | "Danger"> = ["Default", "Danger"];
+  const variants: ComponentNode[] = [];
+
+  for (const type of types) {
+    const variant = await createAlertDialogVariant({ type, lang });
+    safeAppend(figma.currentPage, variant);
+    variants.push(variant);
+  }
+
+  const componentSet = figma.combineAsVariants(variants, figma.currentPage);
+  componentSet.name = `Alert Dialog / ${lang}`;
+  return componentSet;
 }
 
 async function createDropdownMenu(lang: "ar" | "en"): Promise<ComponentNode> {
@@ -2190,8 +2901,20 @@ async function createStepperVariant(config: {
   component.resize(400, 40);
   component.itemSpacing = 8;
   component.primaryAxisAlignItems = "CENTER";
+  component.counterAxisAlignItems = "CENTER";
+
+  // Load font first
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
 
   for (let i = 1; i <= total; i++) {
+    // Use frame to contain circle and text
+    const stepFrame = figma.createFrame();
+    stepFrame.resize(32, 32);
+    stepFrame.fills = [];
+    stepFrame.layoutMode = "HORIZONTAL";
+    stepFrame.primaryAxisAlignItems = "CENTER";
+    stepFrame.counterAxisAlignItems = "CENTER";
+
     const stepCircle = figma.createEllipse();
     stepCircle.resize(32, 32);
     stepCircle.fills = [
@@ -2200,19 +2923,12 @@ async function createStepperVariant(config: {
         color: i <= step ? getColors().primary : { r: 0.9, g: 0.9, b: 0.9 },
       },
     ];
-    stepCircle.strokes = [
-      {
-        type: "SOLID",
-        color: i <= step ? getColors().primary : getColors().border,
-      },
-    ];
-    stepCircle.strokeWeight = 2;
+    stepCircle.x = 0;
+    stepCircle.y = 0;
+    safeAppend(stepFrame, stepCircle);
 
     const stepText = figma.createText();
     stepText.fontName = { family: "Inter", style: "Regular" };
-    try {
-      figma.loadFontAsync({ family: "Inter", style: "Regular" });
-    } catch {}
     stepText.characters = String(i);
     stepText.fontSize = 14;
     stepText.fills = [
@@ -2221,18 +2937,10 @@ async function createStepperVariant(config: {
         color: i <= step ? getColors().white : getColors().muted,
       },
     ];
-    stepText.x = 8;
-    stepText.y = 6;
-    // Use frame to contain circle and text
-    const stepFrame = figma.createFrame();
-    stepFrame.resize(32, 32);
-    stepFrame.fills = [];
-    stepFrame.appendChild(stepCircle);
-    stepFrame.appendChild(stepText);
-    stepCircle.x = 0;
-    stepCircle.y = 0;
-    stepText.x = 8;
-    stepText.y = 6;
+    stepText.x = i >= 10 ? 6 : 10;
+    stepText.y = 7;
+    safeAppend(stepFrame, stepText);
+    
     safeAppend(component, stepFrame);
 
     if (i < total) {
@@ -2386,6 +3094,9 @@ figma.ui.onmessage = async (msg) => {
           case "modal":
             componentSet = await createModalComponentSet(size, lang);
             break;
+          case "alert-dialog":
+            componentSet = await createAlertDialogComponentSet(lang);
+            break;
           case "divider":
             componentSet = await createDividerComponentSet();
             break;
@@ -2423,8 +3134,15 @@ figma.ui.onmessage = async (msg) => {
         }
 
         safeAppend(section, componentSet);
+        
+        // Set relaunch data for easy regeneration (Figma Plugin API best practice)
+        // https://developers.figma.com/docs/plugins/
+        if ('setRelaunchData' in componentSet) {
+          componentSet.setRelaunchData({ regenerate: `Regenerate ${component}` });
+        }
+        
         figma.viewport.scrollAndZoomIntoView([kitFrame]);
-        figma.notify(`Created ${component}`);
+        figma.notify(`✓ Created ${component}`);
         figma.ui.postMessage({
           type: "SUCCESS",
           message: `Created ${component} successfully!`,
