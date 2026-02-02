@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        font-family: Inter, system-ui, -apple-system, sans-serif;
+        padding: 16px;
+        margin: 0;
+        background: #fff;
+      }
+      h3 {
+        margin: 0 0 16px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #111;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 8px;
+      }
+      .tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        border-radius: 6px;
+        color: #666;
+        font-weight: 500;
+      }
+      .tab.active {
+        background: #3c986f;
+        color: #fff;
+      }
+      .tab-content { display: none; }
+      .tab-content.active { display: block; }
+      .form-group { margin: 12px 0; }
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      select, input[type="text"] {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+        outline: none;
+        background: #fff;
+        color: #111;
+      }
+      select:focus, input[type="text"]:focus {
+        border-color: #3c986f;
+      }
+      .color-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+      }
+      .color-row label {
+        margin: 0;
+        min-width: 70px;
+        text-transform: none;
+        font-size: 12px;
+      }
+      input[type="color"] {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 2px;
+        cursor: pointer;
+      }
+      .color-hex {
+        flex: 1;
+        padding: 8px;
+        font-size: 12px;
+        font-family: monospace;
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin: 12px 0;
+      }
+      .checkbox-group input { margin-right: 8px; cursor: pointer; }
+      .checkbox-group label {
+        margin: 0;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: normal;
+        text-transform: none;
+      }
+      .hidden { display: none; }
+      .error-message {
+        display: none;
+        padding: 10px;
+        margin: 12px 0;
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 6px;
+        color: #c00;
+        font-size: 12px;
+      }
+      .error-message.show { display: block; }
+      .success-message {
+        display: none;
+        padding: 10px;
+        margin: 12px 0;
+        background: #efe;
+        border: 1px solid #cfc;
+        border-radius: 6px;
+        color: #060;
+        font-size: 12px;
+      }
+      .success-message.show { display: block; }
+      .btn-row { display: flex; gap: 8px; margin-top: 16px; }
+      button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      button.primary { background: #3c986f; color: #fff; }
+      button.primary:hover { background: #2d7a56; }
+      button.secondary { background: #f0f0f0; color: #333; }
+      button.secondary:hover { background: #e0e0e0; }
+      button:disabled { background: #ccc; cursor: not-allowed; }
+      .section-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: #999;
+        margin: 16px 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3c986f" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+      UI Make
+    </h3>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="components">Components</button>
+      <button class="tab" data-tab="colors">Colors</button>
+      <button class="tab" data-tab="tokens">Tokens</button>
+    </div>
+
+    <!-- Components Tab -->
+    <div class="tab-content active" id="components">
+      <div class="form-group">
+        <label>Component:</label>
+        <select id="component">
+          <optgroup label="Buttons">
+            <option value="button">Button</option>
+            <option value="icon-button">Icon Button</option>
+          </optgroup>
+          <optgroup label="Navigation">
+            <option value="navbar">Navbar</option>
+            <option value="sidebar-item">Sidebar Item</option>
+            <option value="tab">Tab</option>
+            <option value="breadcrumbs">Breadcrumbs</option>
+            <option value="pagination">Pagination</option>
+          </optgroup>
+          <optgroup label="Forms">
+            <option value="text-input">Text Input</option>
+            <option value="search-input">Search Input</option>
+            <option value="select">Select</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="toggle">Toggle</option>
+            <option value="date-picker">Date Picker</option>
+            <option value="stepper">Stepper</option>
+          </optgroup>
+          <optgroup label="Feedback">
+            <option value="alert">Alert</option>
+            <option value="toast">Toast</option>
+            <option value="loading-spinner">Loading Spinner</option>
+            <option value="progress-bar">Progress Bar</option>
+            <option value="tooltip">Tooltip</option>
+          </optgroup>
+          <optgroup label="Layout">
+            <option value="card">Card</option>
+            <option value="modal">Modal</option>
+            <option value="divider">Divider</option>
+            <option value="dropdown">Dropdown Menu</option>
+          </optgroup>
+          <optgroup label="Content">
+            <option value="faq">FAQ</option>
+            <option value="footer">Footer</option>
+            <option value="avatar">Avatar</option>
+            <option value="badge">Badge</option>
+          </optgroup>
+          <optgroup label="Icons">
+            <option value="icon">Icon (Quick Access)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="iconCategoryGroup">
+        <label>Category:</label>
+        <select id="iconCategory">
+          <option value="navigation">Navigation</option>
+          <option value="communication">Communication</option>
+          <option value="actions">Actions</option>
+          <option value="media">Media</option>
+          <option value="system">System</option>
+          <option value="social">Social</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="iconOptionGroup">
+        <label>Icon:</label>
+        <select id="iconOption">
+          <!-- Will be populated dynamically based on category -->
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="iconSizeGroup">
+        <label>Icon Size:</label>
+        <select id="iconSize">
+          <option value="16">16px</option>
+          <option value="20">20px</option>
+          <option value="24" selected>24px</option>
+          <option value="32">32px</option>
+          <option value="48">48px</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="sizeGroup">
+        <label>Size:</label>
+        <select id="size">
+          <option value="Small">Small</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="Large">Large</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="buttonTypeGroup">
+        <label>Button Type:</label>
+        <select id="buttonType">
+          <option value="Primary">Primary</option>
+          <option value="Secondary">Secondary</option>
+          <option value="Ghost">Ghost</option>
+          <option value="Danger">Danger</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="buttonStateGroup">
+        <label>State:</label>
+        <select id="buttonState">
+          <option value="Default">Default</option>
+          <option value="Hover">Hover</option>
+          <option value="Disabled">Disabled</option>
+          <option value="Loading">Loading</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="buttonShapeGroup">
+        <label>Shape:</label>
+        <select id="buttonShape">
+          <option value="Default">Default</option>
+          <option value="Capsule">Capsule</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="buttonIconGroup">
+        <label>Icon:</label>
+        <select id="buttonIcon">
+          <option value="None">None</option>
+          <option value="ri-home-line">Home</option>
+          <option value="ri-search-line">Search</option>
+          <option value="ri-user-line">User</option>
+          <option value="ri-menu-line">Menu</option>
+          <option value="ri-close-line">Close</option>
+          <option value="ri-arrow-right-line">Arrow Right</option>
+          <option value="ri-arrow-left-line">Arrow Left</option>
+          <option value="ri-check-line">Check</option>
+          <option value="ri-calendar-line">Calendar</option>
+          <option value="ri-settings-line">Settings</option>
+          <option value="ri-heart-line">Heart</option>
+          <option value="ri-star-line">Star</option>
+          <option value="ri-notification-line">Notification</option>
+          <option value="ri-mail-line">Mail</option>
+          <option value="ri-phone-line">Phone</option>
+          <option value="ri-download-line">Download</option>
+          <option value="ri-upload-line">Upload</option>
+          <option value="ri-share-line">Share</option>
+          <option value="ri-edit-line">Edit</option>
+          <option value="ri-delete-line">Delete</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Language:</label>
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="ar">Arabic (RTL)</option>
+        </select>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="createAsComponents" checked />
+        <label for="createAsComponents">Create as Components</label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="stackVertically" checked />
+        <label for="stackVertically">Stack outputs vertically</label>
+      </div>
+    </div>
+
+    <!-- Colors Tab -->
+    <div class="tab-content" id="colors">
+      <p class="section-title">Theme Colors</p>
+
+      <div class="color-row">
+        <label>Primary:</label>
+        <input type="color" id="colorPrimary" value="#3C986F" />
+        <input type="text" class="color-hex" id="hexPrimary" value="#3C986F" />
+      </div>
+
+      <div class="color-row">
+        <label>Danger:</label>
+        <input type="color" id="colorDanger" value="#D92D20" />
+        <input type="text" class="color-hex" id="hexDanger" value="#D92D20" />
+      </div>
+
+      <div class="color-row">
+        <label>Warning:</label>
+        <input type="color" id="colorWarning" value="#F59E0B" />
+        <input type="text" class="color-hex" id="hexWarning" value="#F59E0B" />
+      </div>
+
+      <div class="color-row">
+        <label>Success:</label>
+        <input type="color" id="colorSuccess" value="#10B981" />
+        <input type="text" class="color-hex" id="hexSuccess" value="#10B981" />
+      </div>
+
+      <div class="color-row">
+        <label>Info:</label>
+        <input type="color" id="colorInfo" value="#3B82F6" />
+        <input type="text" class="color-hex" id="hexInfo" value="#3B82F6" />
+      </div>
+
+      <p class="section-title">Text & Border</p>
+
+      <div class="color-row">
+        <label>Text:</label>
+        <input type="color" id="colorText" value="#111111" />
+        <input type="text" class="color-hex" id="hexText" value="#111111" />
+      </div>
+
+      <div class="color-row">
+        <label>Muted:</label>
+        <input type="color" id="colorMuted" value="#666666" />
+        <input type="text" class="color-hex" id="hexMuted" value="#666666" />
+      </div>
+
+      <div class="color-row">
+        <label>Border:</label>
+        <input type="color" id="colorBorder" value="#E5E7EB" />
+        <input type="text" class="color-hex" id="hexBorder" value="#E5E7EB" />
+      </div>
+    </div>
+
+    <!-- Tokens Tab -->
+    <div class="tab-content" id="tokens">
+      <p class="section-title">Generate Design Tokens</p>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="tokenColors" checked />
+        <label for="tokenColors">Color Styles</label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="tokenText" checked />
+        <label for="tokenText">Text Styles</label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="tokenEffects" checked />
+        <label for="tokenEffects">Effect Styles (Shadows)</label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="tokenSpacing" checked />
+        <label for="tokenSpacing">Spacing Variables</label>
+      </div>
+
+      <div class="btn-row">
+        <button class="primary" id="generateTokens">Generate Tokens</button>
+      </div>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <div class="btn-row" id="mainButtons">
+      <button class="primary" id="generate">Generate</button>
+      <button class="secondary" id="cancel">Cancel</button>
+    </div>
+
+    <script>
+      // Tab switching
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+
+          // Show/hide main buttons based on tab
+          const mainBtns = document.getElementById('mainButtons');
+          mainBtns.style.display = tab.dataset.tab === 'tokens' ? 'none' : 'flex';
+        });
+      });
+
+      // Color picker sync
+      const colorInputs = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Text', 'Muted', 'Border'];
+      colorInputs.forEach(name => {
+        const picker = document.getElementById('color' + name);
+        const hex = document.getElementById('hex' + name);
+
+        picker.addEventListener('input', () => {
+          hex.value = picker.value.toUpperCase();
+        });
+
+        hex.addEventListener('input', () => {
+          if (/^#[0-9A-Fa-f]{6}$/.test(hex.value)) {
+            picker.value = hex.value;
+          }
+        });
+      });
+
+      const componentSelect = document.getElementById("component");
+      const sizeGroup = document.getElementById("sizeGroup");
+      const errorMessage = document.getElementById("errorMessage");
+      const successMessage = document.getElementById("successMessage");
+
+      const sizeComponents = [
+        "button", "icon-button", "text-input", "search-input", "select",
+        "loading-spinner", "modal", "avatar", "progress-bar", "stepper"
+      ];
+
+      const buttonTypeGroup = document.getElementById("buttonTypeGroup");
+
+      function updateSizeVisibility() {
+        sizeGroup.classList.toggle("hidden", !sizeComponents.includes(componentSelect.value));
+      }
+
+      function updateButtonTypeVisibility() {
+        const isButton = componentSelect.value === "button";
+        buttonTypeGroup.classList.toggle("hidden", !isButton);
+        document.getElementById("buttonStateGroup").classList.toggle("hidden", !isButton);
+        document.getElementById("buttonShapeGroup").classList.toggle("hidden", !isButton);
+        document.getElementById("buttonIconGroup").classList.toggle("hidden", !isButton);
+      }
+
+      // Icon category and options
+      const iconCategoryGroup = document.getElementById("iconCategoryGroup");
+      const iconOptionGroup = document.getElementById("iconOptionGroup");
+      const iconSizeGroup = document.getElementById("iconSizeGroup");
+      const iconCategory = document.getElementById("iconCategory");
+      const iconOption = document.getElementById("iconOption");
+
+      // Icon options by category
+      const iconOptions = {
+        navigation: [
+          { value: "ri-home-line", label: "Home" },
+          { value: "ri-menu-line", label: "Menu" },
+          { value: "ri-arrow-right-line", label: "Arrow Right" },
+          { value: "ri-arrow-left-line", label: "Arrow Left" },
+          { value: "ri-arrow-up-line", label: "Arrow Up" },
+          { value: "ri-arrow-down-line", label: "Arrow Down" },
+          { value: "ri-close-line", label: "Close" },
+          { value: "ri-search-line", label: "Search" }
+        ],
+        communication: [
+          { value: "ri-mail-line", label: "Mail" },
+          { value: "ri-phone-line", label: "Phone" },
+          { value: "ri-notification-line", label: "Notification" },
+          { value: "ri-message-line", label: "Message" },
+          { value: "ri-chat-line", label: "Chat" },
+          { value: "ri-send-line", label: "Send" }
+        ],
+        actions: [
+          { value: "ri-check-line", label: "Check" },
+          { value: "ri-edit-line", label: "Edit" },
+          { value: "ri-delete-line", label: "Delete" },
+          { value: "ri-download-line", label: "Download" },
+          { value: "ri-upload-line", label: "Upload" },
+          { value: "ri-share-line", label: "Share" },
+          { value: "ri-settings-line", label: "Settings" },
+          { value: "ri-filter-line", label: "Filter" }
+        ],
+        media: [
+          { value: "ri-image-line", label: "Image" },
+          { value: "ri-video-line", label: "Video" },
+          { value: "ri-camera-line", label: "Camera" },
+          { value: "ri-mic-line", label: "Microphone" },
+          { value: "ri-play-line", label: "Play" },
+          { value: "ri-pause-line", label: "Pause" }
+        ],
+        system: [
+          { value: "ri-user-line", label: "User" },
+          { value: "ri-calendar-line", label: "Calendar" },
+          { value: "ri-time-line", label: "Time" },
+          { value: "ri-file-line", label: "File" },
+          { value: "ri-folder-line", label: "Folder" },
+          { value: "ri-link-line", label: "Link" }
+        ],
+        social: [
+          { value: "ri-heart-line", label: "Heart" },
+          { value: "ri-star-line", label: "Star" },
+          { value: "ri-bookmark-line", label: "Bookmark" },
+          { value: "ri-thumb-up-line", label: "Thumb Up" },
+          { value: "ri-thumb-down-line", label: "Thumb Down" }
+        ]
+      };
+
+      function updateIconVisibility() {
+        const isIcon = componentSelect.value === "icon";
+        iconCategoryGroup.classList.toggle("hidden", !isIcon);
+        iconOptionGroup.classList.toggle("hidden", !isIcon);
+        iconSizeGroup.classList.toggle("hidden", !isIcon);
+        if (isIcon) {
+          updateIconOptions();
+        }
+      }
+
+      function updateIconOptions() {
+        const category = iconCategory.value;
+        const options = iconOptions[category] || [];
+        iconOption.innerHTML = "";
+        options.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt.value;
+          option.textContent = opt.label;
+          iconOption.appendChild(option);
+        });
+      }
+
+      iconCategory.addEventListener("change", updateIconOptions);
+
+      componentSelect.addEventListener("change", () => {
+        updateSizeVisibility();
+        updateButtonTypeVisibility();
+        updateIconVisibility();
+      });
+      updateSizeVisibility();
+      updateButtonTypeVisibility();
+      updateIconVisibility();
+
+      function getColors() {
+        return {
+          primary: document.getElementById('hexPrimary').value,
+          danger: document.getElementById('hexDanger').value,
+          warning: document.getElementById('hexWarning').value,
+          success: document.getElementById('hexSuccess').value,
+          info: document.getElementById('hexInfo').value,
+          text: document.getElementById('hexText').value,
+          muted: document.getElementById('hexMuted').value,
+          border: document.getElementById('hexBorder').value
+        };
+      }
+
+      function showSuccess(msg) {
+        successMessage.textContent = msg;
+        successMessage.classList.add('show');
+        setTimeout(() => successMessage.classList.remove('show'), 3000);
+      }
+
+      function showError(msg) {
+        errorMessage.textContent = msg;
+        errorMessage.classList.add('show');
+        setTimeout(() => errorMessage.classList.remove('show'), 5000);
+      }
+
+      window.onmessage = (event) => {
+        const msg = event.data?.pluginMessage;
+        if (!msg) return;
+        if (msg.type === "ERROR") showError(msg.error);
+        else if (msg.type === "SUCCESS") showSuccess(msg.message || "Created successfully!");
+      };
+
+      document.getElementById("generate").onclick = () => {
+        const isButton = componentSelect.value === "button";
+        const isIcon = componentSelect.value === "icon";
+        const buttonType = isButton ? (document.getElementById("buttonType")?.value || "Primary") : undefined;
+        const buttonState = isButton ? (document.getElementById("buttonState")?.value || "Default") : undefined;
+        const buttonShape = isButton ? (document.getElementById("buttonShape")?.value || "Default") : undefined;
+        const buttonIcon = isButton ? (document.getElementById("buttonIcon")?.value || "None") : undefined;
+        const iconCategory = isIcon ? (document.getElementById("iconCategory")?.value || "navigation") : undefined;
+        const iconOption = isIcon ? (document.getElementById("iconOption")?.value || "") : undefined;
+        const iconSize = isIcon ? (parseInt(document.getElementById("iconSize")?.value || "24")) : undefined;
+        
+        parent.postMessage({
+          pluginMessage: {
+            type: "GENERATE_COMPONENT",
+            payload: {
+              component: componentSelect.value,
+              lang: document.getElementById("lang").value,
+              size: document.getElementById("size").value,
+              buttonType: buttonType,
+              buttonState: buttonState,
+              buttonShape: buttonShape,
+              buttonIcon: buttonIcon,
+              iconCategory: iconCategory,
+              iconOption: iconOption,
+              iconSize: iconSize,
+              createAsComponents: document.getElementById("createAsComponents").checked,
+              stackVertically: document.getElementById("stackVertically").checked,
+              colors: getColors()
+            }
+          }
+        }, "*");
+      };
+
+      document.getElementById("generateTokens").onclick = () => {
+        parent.postMessage({
+          pluginMessage: {
+            type: "GENERATE_TOKENS",
+            payload: {
+              colors: document.getElementById("tokenColors").checked,
+              text: document.getElementById("tokenText").checked,
+              effects: document.getElementById("tokenEffects").checked,
+              spacing: document.getElementById("tokenSpacing").checked,
+              colorValues: getColors()
+            }
+          }
+        }, "*");
+      };
+
+      document.getElementById("cancel").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "CANCEL" } }, "*");
+      };
+    </script>
+  </body>
+</html>
