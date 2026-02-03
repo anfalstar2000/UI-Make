@@ -1,40 +1,89 @@
-Below are the steps to get your plugin running. You can also find instructions at:
+# UI Make - Figma Plugin
 
-  https://www.figma.com/plugin-docs/plugin-quickstart-guide/
+A comprehensive design system generator for Figma, featuring shadcn/ui style components, 3000+ icons from Remix Icon, and quick effects application.
 
-This plugin template uses Typescript and NPM, two standard tools in creating JavaScript applications.
+## Features
 
-First, download Node.js which comes with NPM. This will allow you to install TypeScript and other
-libraries. You can find the download link here:
+### 🧩 Components (57 Components)
+Generate ready-to-use UI components organized in 7 categories:
+- **Buttons**: Button, Button Group, Toggle, Toggle Group
+- **Forms**: Input, Textarea, Checkbox, Radio, Switch, Select, Slider, Date Picker, etc.
+- **Layout**: Card, Accordion, Tabs, Separator, Scroll Area, etc.
+- **Navigation**: Breadcrumb, Navigation Menu, Pagination, Sidebar
+- **Feedback**: Alert, Toast, Progress, Spinner, Skeleton
+- **Overlay**: Dialog, Drawer, Sheet, Popover, Tooltip, Dropdown Menu
+- **Data Display**: Avatar, Badge, Table, Chart, Typography
 
-  https://nodejs.org/en/download/
+### 🎨 Icons (3,229 Icons)
+Full Remix Icon library integration with:
+- 21 categories (Arrows, System, Media, Logos, etc.)
+- Search functionality
+- Multiple sizes (16px, 20px, 24px, 32px, 48px)
+- One-click insertion
 
-Next, install TypeScript using the command:
+### ✨ Effects
+Apply effects to selected layers:
+- **Shadows**: Soft, Medium, Strong, Inner
+- **Blur**: Light, Medium, Strong, Background
+- **Borders**: Thin, Medium, Accent, Dashed
+- **Opacity**: 90%, 75%, 50%, 25%
 
-  npm install -g typescript
+## Installation
 
-Finally, in the directory of your plugin, get the latest type definitions for the plugin API by running:
+1. Download or clone this repository
+2. Open Figma Desktop
+3. Go to Plugins > Development > Import plugin from manifest
+4. Select the `manifest.json` file
 
-  npm install --save-dev @figma/plugin-typings
+## Development
 
-If you are familiar with JavaScript, TypeScript will look very familiar. In fact, valid JavaScript code
-is already valid Typescript code.
+### Prerequisites
+- Node.js (https://nodejs.org/)
+- npm
 
-TypeScript adds type annotations to variables. This allows code editors such as Visual Studio Code
-to provide information about the Figma API while you are writing code, as well as help catch bugs
-you previously didn't notice.
+### Setup
+```bash
+# Install dependencies
+npm install
 
-For more information, visit https://www.typescriptlang.org/
+# Build the plugin
+npm run build
 
-Using TypeScript requires a compiler to convert TypeScript (code.ts) into JavaScript (code.js)
-for the browser to run.
+# Watch for changes during development
+npm run watch
+```
 
-We recommend writing TypeScript code using Visual Studio code:
+### Project Structure
+```
+UI Make/
+├── manifest.json      # Figma plugin manifest
+├── ui.html           # Plugin UI
+├── code.ts           # Plugin backend (TypeScript)
+├── code.js           # Compiled plugin backend
+├── icons/            # Remix Icon SVG files
+├── icon-paths.ts     # Generated icon paths
+└── icon-paths.json   # Icon data for UI
+```
 
-1. Download Visual Studio Code if you haven't already: https://code.visualstudio.com/.
-2. Open this directory in Visual Studio Code.
-3. Compile TypeScript to JavaScript: Run the "Terminal > Run Build Task..." menu item,
-    then select "npm: watch". You will have to do this again every time
-    you reopen Visual Studio Code.
+### Regenerating Icons
+If you update the icons folder:
+```bash
+node generate-icons.js
+node build-code.js
+```
 
-That's it! Visual Studio Code will regenerate the JavaScript file every time you save.
+## Usage
+
+1. Open Figma and run the plugin
+2. **Components Tab**: Select a component and click "Generate"
+3. **Icons Tab**: Browse categories, search, select size, and click "Insert icon"
+4. **Effects Panel**: Select a layer in Figma, choose an effect, click "add"
+
+## Credits
+
+- Components inspired by [shadcn/ui](https://ui.shadcn.com/)
+- Icons from [Remix Icon](https://remixicon.com/)
+
+## License
+
+MIT License - Feel free to use in personal and commercial projects.
